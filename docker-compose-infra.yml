@@ -1,0 +1,42 @@
+version: '3.8'
+
+# Infrastructure services only (using external PostgreSQL)
+# Note: PostgreSQL is hosted on localhost:5432 with user 'libin'
+
+services:
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: quant-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - quant-network
+
+  # Nacos Service Registry and Config Center
+  nacos:
+    image: nacos/nacos-server:v2.1.0
+    container_name: quant-nacos
+    environment:
+      MODE: standalone
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    volumes:
+      - nacos_data:/home/nacos/data
+    networks:
+      - quant-network
+
+volumes:
+  rabbitmq_data:
+  nacos_data:
+
+networks:
+  quant-network:
+    driver: bridge

@@ -1,0 +1,61 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: quant-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER:localhost:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+      config:
+        server-addr: ${NACOS_SERVER:localhost:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+        file-extension: yml
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user-service
+          uri: lb://quant-user
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=1
+
+        - id: trade-service
+          uri: lb://quant-trade
+          predicates:
+            - Path=/api/trade/**
+          filters:
+            - StripPrefix=1
+
+        - id: risk-service
+          uri: lb://quant-risk
+          predicates:
+            - Path=/api/risk/**
+          filters:
+            - StripPrefix=1
+
+        - id: market-service
+          uri: lb://quant-market
+          predicates:
+            - Path=/api/market/**
+          filters:
+            - StripPrefix=1
+
+        - id: strategy-service
+          uri: lb://quant-strategy
+          predicates:
+            - Path=/api/strategy/**
+          filters:
+            - StripPrefix=1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
