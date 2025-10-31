@@ -14,14 +14,22 @@ public class User extends AggregateRoot {
     private static final long serialVersionUID = 1L;
 
     private String username;
+    private String nickName;
     private String email;
     private String mobile;
     private String password;
+    private Sex sex;
     private UserStatus status;
 
     public enum UserStatus {
         ACTIVE,
         INACTIVE,
         LOCKED
+    }
+
+    public enum Sex {
+        MALE,
+        FEMALE,
+        UNKNOWN
     }
 }

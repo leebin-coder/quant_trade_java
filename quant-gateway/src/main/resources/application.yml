@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: quant-gateway
+  config:
+    import: optional:nacos:${spring.application.name}.${spring.cloud.nacos.config.file-extension}
   cloud:
     nacos:
       discovery:
@@ -19,13 +21,23 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
+        # Auth routes (no authentication required)
+        - id: auth-service
+          uri: lb://quant-user
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=0
+
+        # User service routes
         - id: user-service
           uri: lb://quant-user
           predicates:
-            - Path=/api/user/**
+            - Path=/user/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=0
 
+        # Trade service routes
         - id: trade-service
           uri: lb://quant-trade
           predicates:
@@ -33,6 +45,7 @@ spring:
           filters:
             - StripPrefix=1
 
+        # Risk service routes
         - id: risk-service
           uri: lb://quant-risk
           predicates:
@@ -40,19 +53,26 @@ spring:
           filters:
             - StripPrefix=1
 
+        # Market service routes
         - id: market-service
           uri: lb://quant-market
           predicates:
-            - Path=/api/market/**
+            - Path=/api/stocks/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=0
 
+        # Strategy service routes
         - id: strategy-service
           uri: lb://quant-strategy
           predicates:
             - Path=/api/strategy/**
           filters:
             - StripPrefix=1
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:quant-trade-secret-key-for-jwt-token-generation-must-be-at-least-256-bits}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 management:
   endpoints:

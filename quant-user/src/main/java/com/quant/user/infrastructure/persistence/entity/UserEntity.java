@@ -17,17 +17,24 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column
     private String username;
+
+    @Column(name = "nick_name")
+    private String nickName;
 
     @Column(unique = true)
     private String email;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String mobile;
 
-    @Column(nullable = false)
+    @Column
     private String password;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Sex sex;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -57,10 +64,19 @@ public class UserEntity {
         LOCKED
     }
 
+    public enum Sex {
+        MALE,
+        FEMALE,
+        UNKNOWN
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (sex == null) {
+            sex = Sex.UNKNOWN;
+        }
     }
 
     @PreUpdate

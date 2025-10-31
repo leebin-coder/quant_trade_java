@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface UserJpaRepository extends BaseRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByUsername(String username);
+
+    Optional<UserEntity> findByMobile(String mobile);
 }

@@ -24,10 +24,13 @@
             <artifactId>quant-common</artifactId>
         </dependency>
 
+        <!-- RabbitMQ - Disabled temporarily -->
+        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
+        -->
 
         <dependency>
             <groupId>org.projectlombok</groupId>
