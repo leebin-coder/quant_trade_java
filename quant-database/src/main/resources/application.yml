@@ -13,7 +13,7 @@ spring:
 
   jpa:
     database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     hibernate:
       ddl-auto: validate
