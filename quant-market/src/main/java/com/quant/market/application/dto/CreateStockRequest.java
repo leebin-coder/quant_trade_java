@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -53,6 +54,41 @@ public class CreateStockRequest {
     private String status;
 
     /**
+     * Latest price (Optional)
+     */
+    private BigDecimal latestPrice;
+
+    /**
+     * Previous close price (Optional)
+     */
+    private BigDecimal prevClosePrice;
+
+    /**
+     * Close price from 2 trading days ago (Optional)
+     */
+    private BigDecimal prevPrevClosePrice;
+
+    /**
+     * Total shares (Optional)
+     */
+    private BigDecimal totalShares;
+
+    /**
+     * Circulating shares (Optional)
+     */
+    private BigDecimal circulatingShares;
+
+    /**
+     * Total market cap (Optional)
+     */
+    private BigDecimal totalMarketCap;
+
+    /**
+     * Circulating market cap (Optional)
+     */
+    private BigDecimal circulatingMarketCap;
+
+    /**
      * Convert to domain model
      * If exchange is not provided, it will be auto-detected from stock code
      */
@@ -73,6 +109,13 @@ public class CreateStockRequest {
                 .listingDate(listingDate)
                 .industry(industry)
                 .status(status != null ? Stock.StockStatus.valueOf(status.toUpperCase()) : Stock.StockStatus.LISTED)
+                .latestPrice(latestPrice)
+                .prevClosePrice(prevClosePrice)
+                .prevPrevClosePrice(prevPrevClosePrice)
+                .totalShares(totalShares)
+                .circulatingShares(circulatingShares)
+                .totalMarketCap(totalMarketCap)
+                .circulatingMarketCap(circulatingMarketCap)
                 .build();
     }
 }

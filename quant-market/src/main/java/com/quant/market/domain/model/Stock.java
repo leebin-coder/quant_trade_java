@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -27,6 +28,13 @@ public class Stock extends BaseEntity {
     private LocalDate listingDate;
     private String industry;
     private StockStatus status;
+    private BigDecimal latestPrice;
+    private BigDecimal prevClosePrice;
+    private BigDecimal prevPrevClosePrice;
+    private BigDecimal totalShares;
+    private BigDecimal circulatingShares;
+    private BigDecimal totalMarketCap;
+    private BigDecimal circulatingMarketCap;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

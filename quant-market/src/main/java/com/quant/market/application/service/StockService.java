@@ -80,6 +80,27 @@ public class StockService {
         if (request.getStatus() != null) {
             stock.setStatus(Stock.StockStatus.valueOf(request.getStatus()));
         }
+        if (request.getLatestPrice() != null) {
+            stock.setLatestPrice(request.getLatestPrice());
+        }
+        if (request.getPrevClosePrice() != null) {
+            stock.setPrevClosePrice(request.getPrevClosePrice());
+        }
+        if (request.getPrevPrevClosePrice() != null) {
+            stock.setPrevPrevClosePrice(request.getPrevPrevClosePrice());
+        }
+        if (request.getTotalShares() != null) {
+            stock.setTotalShares(request.getTotalShares());
+        }
+        if (request.getCirculatingShares() != null) {
+            stock.setCirculatingShares(request.getCirculatingShares());
+        }
+        if (request.getTotalMarketCap() != null) {
+            stock.setTotalMarketCap(request.getTotalMarketCap());
+        }
+        if (request.getCirculatingMarketCap() != null) {
+            stock.setCirculatingMarketCap(request.getCirculatingMarketCap());
+        }
 
         Stock updated = stockRepository.save(stock);
 
@@ -322,10 +343,10 @@ public class StockService {
     }
 
     /**
-     * Query stocks by multiple conditions
+     * Query stocks by multiple conditions (with optional pagination)
      */
     @Transactional(readOnly = true)
-    public List<StockDTO> queryStocks(StockQueryRequest request) {
+    public Object queryStocks(StockQueryRequest request) {
         log.info("Querying stocks with conditions: {}", request);
 
         // Convert string lists to enums
@@ -354,9 +375,72 @@ public class StockService {
 
         log.info("Found {} stocks matching the query conditions", stocks.size());
 
-        return stocks.stream()
-                .map(StockDTO::fromDomain)
-                .collect(Collectors.toList());
+        // Check if pagination is requested
+        if (request.getPage() != null && request.getSize() != null) {
+            // Return paginated result
+            int page = request.getPage();
+            int size = request.getSize();
+            String sortBy = request.getSortBy() != null ? request.getSortBy() : "createdAt";
+            String sortDir = request.getSortDir() != null ? request.getSortDir() : "desc";
+
+            // Manual pagination
+            int totalElements = stocks.size();
+            int fromIndex = page * size;
+            int toIndex = Math.min(fromIndex + size, totalElements);
+
+            List<StockDTO> pagedStocks;
+            if (fromIndex >= totalElements) {
+                pagedStocks = new ArrayList<>();
+            } else {
+                // Apply sorting
+                stocks.sort((s1, s2) -> {
+                    int comparison = 0;
+                    switch (sortBy) {
+                        case "stockCode":
+                            comparison = s1.getStockCode().compareTo(s2.getStockCode());
+                            break;
+                        case "stockName":
+                            comparison = s1.getStockName().compareTo(s2.getStockName());
+                            break;
+                        case "exchange":
+                            comparison = s1.getExchange().compareTo(s2.getExchange());
+                            break;
+                        case "listingDate":
+                            comparison = s1.getListingDate().compareTo(s2.getListingDate());
+                            break;
+                        case "createdAt":
+                        default:
+                            comparison = s1.getCreatedAt().compareTo(s2.getCreatedAt());
+                            break;
+                    }
+                    return sortDir.equalsIgnoreCase("asc") ? comparison : -comparison;
+                });
+
+                pagedStocks = stocks.subList(fromIndex, toIndex).stream()
+                        .map(StockDTO::fromDomain)
+                        .collect(Collectors.toList());
+            }
+
+            // Create PageResult
+            com.quant.common.response.PageResult<StockDTO> pageResult =
+                    com.quant.common.response.PageResult.success(
+                            pagedStocks,
+                            page,
+                            size,
+                            (long) totalElements
+                    );
+
+            log.info("Returning paginated result: page={}, size={}, total={}", page, size, totalElements);
+            return pageResult;
+        } else {
+            // Return all results without pagination
+            List<StockDTO> stockDTOs = stocks.stream()
+                    .map(StockDTO::fromDomain)
+                    .collect(Collectors.toList());
+
+            log.info("Returning all {} results without pagination", stockDTOs.size());
+            return stockDTOs;
+        }
     }
 
     /**

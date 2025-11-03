@@ -259,12 +259,12 @@ mvn spring-boot:run
 
 ```bash
 # 发送验证码
-curl -X POST http://localhost:8080/auth/send-code \
+curl -X POST http://localhost:8080/api/auth/send-code \
   -H "Content-Type: application/json" \
   -d '{"phone":"13800138000"}'
 
 # 登录获取 Token
-curl -X POST http://localhost:8080/auth/login \
+curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"phone":"13800138000","code":"123456"}'
 ```
@@ -273,10 +273,10 @@ curl -X POST http://localhost:8080/auth/login \
 
 ```bash
 # 无 Token 访问（应返回 401）
-curl -X GET http://localhost:8080/user/1
+curl -X GET http://localhost:8080/api/user/1
 
 # 带 Token 访问（应返回 200）
-curl -X GET http://localhost:8080/user/1 \
+curl -X GET http://localhost:8080/api/user/1 \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 

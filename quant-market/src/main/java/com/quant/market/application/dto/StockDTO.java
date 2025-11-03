@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -26,6 +27,13 @@ public class  StockDTO {
     private LocalDate listingDate;
     private String industry;
     private String status;
+    private BigDecimal latestPrice;
+    private BigDecimal prevClosePrice;
+    private BigDecimal prevPrevClosePrice;
+    private BigDecimal totalShares;
+    private BigDecimal circulatingShares;
+    private BigDecimal totalMarketCap;
+    private BigDecimal circulatingMarketCap;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -42,6 +50,13 @@ public class  StockDTO {
                 .listingDate(stock.getListingDate())
                 .industry(stock.getIndustry())
                 .status(stock.getStatus().name())
+                .latestPrice(stock.getLatestPrice())
+                .prevClosePrice(stock.getPrevClosePrice())
+                .prevPrevClosePrice(stock.getPrevPrevClosePrice())
+                .totalShares(stock.getTotalShares())
+                .circulatingShares(stock.getCirculatingShares())
+                .totalMarketCap(stock.getTotalMarketCap())
+                .circulatingMarketCap(stock.getCirculatingMarketCap())
                 .createdAt(stock.getCreatedAt())
                 .updatedAt(stock.getUpdatedAt())
                 .build();
@@ -60,6 +75,13 @@ public class  StockDTO {
                 .listingDate(listingDate)
                 .industry(industry)
                 .status(Stock.StockStatus.valueOf(status))
+                .latestPrice(latestPrice)
+                .prevClosePrice(prevClosePrice)
+                .prevPrevClosePrice(prevPrevClosePrice)
+                .totalShares(totalShares)
+                .circulatingShares(circulatingShares)
+                .totalMarketCap(totalMarketCap)
+                .circulatingMarketCap(circulatingMarketCap)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();

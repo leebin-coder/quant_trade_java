@@ -31,7 +31,7 @@
 ```
 > 系统会自动识别 `600000` 为上海证券交易所（SH）
 
-**请求体示例2 - 手动指定交易所**:
+**请求体示例2 - 手动指定交易所（含市场数据）**:
 ```json
 {
   "exchange": "SH",
@@ -40,9 +40,25 @@
   "companyName": "上海浦东发展银行股份有限公司",
   "listingDate": "1999-11-10",
   "industry": "银行",
-  "status": "LISTED"
+  "status": "LISTED",
+  "latestPrice": 10.58,
+  "prevClosePrice": 10.50,
+  "prevPrevClosePrice": 10.45,
+  "totalShares": 29352020012.00,
+  "circulatingShares": 29352020012.00,
+  "totalMarketCap": 310584291726.96,
+  "circulatingMarketCap": 310584291726.96
 }
 ```
+
+**市场数据字段说明**（所有字段均为可选）:
+- `latestPrice`: 最新股价
+- `prevClosePrice`: 上一个交易日收盘价
+- `prevPrevClosePrice`: 上上个交易日收盘价
+- `totalShares`: 总股本
+- `circulatingShares`: 流通股
+- `totalMarketCap`: 总市值
+- `circulatingMarketCap`: 流通市值
 
 **自动识别规则**:
 - SH（上交所）: 60xxxx, 688xxx（科创板）, 900xxx（B股）
@@ -67,6 +83,13 @@
     "listingDate": "1999-11-10",
     "industry": "银行",
     "status": "LISTED",
+    "latestPrice": 10.58,
+    "prevClosePrice": 10.50,
+    "prevPrevClosePrice": 10.45,
+    "totalShares": 29352020012.00,
+    "circulatingShares": 29352020012.00,
+    "totalMarketCap": 310584291726.96,
+    "circulatingMarketCap": 310584291726.96,
     "createdAt": "2025-10-31T16:00:00",
     "updatedAt": "2025-10-31T16:00:00"
   }
@@ -82,14 +105,21 @@
 **路径参数**:
 - `id`: 股票ID
 
-**请求体**:
+**请求体**（所有字段均为可选）:
 ```json
 {
   "stockName": "浦发银行",
   "companyName": "上海浦东发展银行股份有限公司",
   "listingDate": "1999-11-10",
   "industry": "银行",
-  "status": "LISTED"
+  "status": "LISTED",
+  "latestPrice": 10.58,
+  "prevClosePrice": 10.50,
+  "prevPrevClosePrice": 10.45,
+  "totalShares": 29352020012.00,
+  "circulatingShares": 29352020012.00,
+  "totalMarketCap": 310584291726.96,
+  "circulatingMarketCap": 310584291726.96
 }
 ```
 
@@ -271,6 +301,39 @@
 - `LISTED`: 上市
 - `DELISTED`: 退市
 - `SUSPENDED`: 停牌
+
+---
+
+## 数据字段说明
+
+### 基础信息字段
+| 字段名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| stockCode | String | 是 | 股票代码 |
+| stockName | String | 是 | 股票简称 |
+| companyName | String | 是 | 公司全称 |
+| listingDate | Date | 是 | 上市日期 (格式: YYYY-MM-DD) |
+| exchange | String | 否 | 交易所代码 (不填则自动识别) |
+| industry | String | 否 | 行业分类 |
+| status | String | 否 | 股票状态 (默认: LISTED) |
+
+### 市场数据字段（所有字段均为可选）
+| 字段名 | 类型 | 说明 | 数据库类型 |
+|--------|------|------|------------|
+| latestPrice | BigDecimal | 最新股价 | DECIMAL(18,4) |
+| prevClosePrice | BigDecimal | 上一个交易日收盘价 | DECIMAL(18,4) |
+| prevPrevClosePrice | BigDecimal | 上上个交易日收盘价 | DECIMAL(18,4) |
+| totalShares | BigDecimal | 总股本 | DECIMAL(20,2) |
+| circulatingShares | BigDecimal | 流通股 | DECIMAL(20,2) |
+| totalMarketCap | BigDecimal | 总市值 | DECIMAL(18,2) |
+| circulatingMarketCap | BigDecimal | 流通市值 | DECIMAL(18,2) |
+
+### 系统字段
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| id | Long | 股票ID (系统自动生成) |
+| createdAt | DateTime | 创建时间 (系统自动生成) |
+| updatedAt | DateTime | 更新时间 (系统自动维护) |
 
 ---
 

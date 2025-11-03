@@ -35,7 +35,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
      * Whitelist paths that don't require authentication
      */
     private static final List<String> WHITELIST_PATHS = Arrays.asList(
-            "/auth/**",              // Authentication endpoints
+            "/api/auth/**",              // Authentication endpoints
             "/actuator/**",          // Actuator endpoints
             "/error",                // Error endpoint
             "/favicon.ico"           // Favicon

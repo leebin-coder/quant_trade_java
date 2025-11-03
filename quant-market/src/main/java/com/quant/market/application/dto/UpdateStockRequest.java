@@ -2,6 +2,7 @@ package com.quant.market.application.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -15,4 +16,11 @@ public class UpdateStockRequest {
     private LocalDate listingDate;
     private String industry;
     private String status;
+    private BigDecimal latestPrice;
+    private BigDecimal prevClosePrice;
+    private BigDecimal prevPrevClosePrice;
+    private BigDecimal totalShares;
+    private BigDecimal circulatingShares;
+    private BigDecimal totalMarketCap;
+    private BigDecimal circulatingMarketCap;
 }

@@ -21,7 +21,7 @@
 
 ### 1. 发送验证码
 
-**接口**: `POST /auth/send-code`
+**接口**: `POST /api/auth/send-code`
 
 **请求示例**:
 ```json
@@ -53,7 +53,7 @@
 
 ### 2. 登录获取 Token
 
-**接口**: `POST /auth/login`
+**接口**: `POST /api/auth/login`
 
 **请求示例**:
 ```json
@@ -145,7 +145,7 @@ export default api;
 // 1. 发送验证码
 const sendCode = async (phone) => {
   try {
-    const response = await api.post('/auth/send-code', { phone });
+    const response = await api.post('/api/auth/send-code', { phone });
     console.log('验证码:', response.data.data.code);
     console.log('是否已注册:', response.data.data.isRegistered);
     return response.data;
@@ -157,7 +157,7 @@ const sendCode = async (phone) => {
 // 2. 登录
 const login = async (phone, code) => {
   try {
-    const response = await api.post('/auth/login', { phone, code });
+    const response = await api.post('/api/auth/login', { phone, code });
     const { token, userId, nickName } = response.data.data;
 
     // 保存 token 到本地存储
@@ -175,7 +175,7 @@ const login = async (phone, code) => {
 const getUserInfo = async (userId) => {
   try {
     // token 会通过拦截器自动添加
-    const response = await api.get(`/user/${userId}`);
+    const response = await api.get(`/api/user/${userId}`);
     return response.data;
   } catch (error) {
     console.error('获取用户信息失败:', error);
@@ -188,7 +188,7 @@ const getUserInfo = async (userId) => {
 ```javascript
 // 登录
 async function login(phone, code) {
-  const response = await fetch('http://localhost:8080/auth/login', {  // 通过网关
+  const response = await fetch('http://localhost:8080/api/auth/login', {  // 通过网关
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -208,7 +208,7 @@ async function login(phone, code) {
 async function getUserInfo(userId) {
   const token = localStorage.getItem('token');
 
-  const response = await fetch(`http://localhost:8080/user/${userId}`, {  // 通过网关
+  const response = await fetch(`http://localhost:8080/api/user/${userId}`, {  // 通过网关
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -307,13 +307,13 @@ api.interceptors.response.use(
 export const authService = {
   // 发送验证码
   sendCode: async (phone) => {
-    const response = await api.post('/auth/send-code', { phone });
+    const response = await api.post('api/auth/send-code', { phone });
     return response.data;
   },
 
   // 登录
   login: async (phone, code) => {
-    const response = await api.post('/auth/login', { phone, code });
+    const response = await api.post('/api/auth/login', { phone, code });
     if (response.data.code === 200) {
       const { token, userId, nickName } = response.data.data;
       localStorage.setItem('token', token);
@@ -444,19 +444,19 @@ POSTGRES_PASSWORD=your-secure-password
 
 通过网关访问时，路由规则如下：
 
-| 原始路径 | 网关路径 | 目标服务 | 是否需要鉴权 |
-|---------|---------|---------|-------------|
-| `/auth/**` | `/auth/**` | quant-user | ❌ 否 |
-| `/user/**` | `/user/**` | quant-user | ✅ 是 |
-| `/api/stocks/**` | `/api/stocks/**` | quant-market | ✅ 是 |
-| `/api/trade/**` | `/api/trade/**` | quant-trade | ✅ 是 |
-| `/api/risk/**` | `/api/risk/**` | quant-risk | ✅ 是 |
+| 原始路径               | 网关路径               | 目标服务 | 是否需要鉴权 |
+|--------------------|--------------------|---------|-------------|
+| `/api/auth/**`     | `/api/auth/**`     | quant-user | ❌ 否 |
+| `/api//user/**`    | `/api//user/**`         | quant-user | ✅ 是 |
+| `/api/stocks/**`   | `/api/stocks/**`   | quant-market | ✅ 是 |
+| `/api/trade/**`    | `/api/trade/**`    | quant-trade | ✅ 是 |
+| `/api/risk/**`     | `/api/risk/**`     | quant-risk | ✅ 是 |
 | `/api/strategy/**` | `/api/strategy/**` | quant-strategy | ✅ 是 |
 
 ### 白名单路径（无需 Token）
 
 以下路径无需提供 Token，可直接访问：
-- `/auth/**` - 认证相关接口（登录、发送验证码）
+- `/api/auth/**` - 认证相关接口（登录、发送验证码）
 - `/actuator/**` - 监控接口
 - `/error` - 错误页面
 - `/favicon.ico` - 网站图标
@@ -468,10 +468,10 @@ POSTGRES_PASSWORD=your-secure-password
 const API_BASE_URL = 'http://localhost:8080';
 
 // 登录（无需 Token）
-await axios.post(`${API_BASE_URL}/auth/login`, { phone, code });
+await axios.post(`${API_BASE_URL}/api/auth/login`, { phone, code });
 
 // 获取用户信息（需要 Token）
-await axios.get(`${API_BASE_URL}/user/123`, {
+await axios.get(`${API_BASE_URL}/api/user/123`, {
   headers: { 'Authorization': `Bearer ${token}` }
 });
 

@@ -25,7 +25,7 @@ spring:
         - id: auth-service
           uri: lb://quant-user
           predicates:
-            - Path=/auth/**
+            - Path=/api/auth/**
           filters:
             - StripPrefix=0
 
@@ -33,7 +33,7 @@ spring:
         - id: user-service
           uri: lb://quant-user
           predicates:
-            - Path=/user/**
+            - Path=/api/user/**
           filters:
             - StripPrefix=0
 
@@ -73,6 +73,8 @@ spring:
 jwt:
   secret: ${JWT_SECRET:quant-trade-secret-key-for-jwt-token-generation-must-be-at-least-256-bits}
   expiration: ${JWT_EXPIRATION:86400000}
+  # Python Service Token (永久token, 100年有效期)
+  python-service-token: eyJhbGciOiJIUzUxMiJ9.eyJzZXJ2aWNlIjoicHl0aG9uLXNlcnZpY2UiLCJ0eXBlIjoic2VydmljZSIsInVzZXJJZCI6OTk5OTk5LCJpYXQiOjE3NjE5ODc3OTksImV4cCI6NDkxNTU4Nzc5OX0.Vh_apdQtxXXDkgC0uHmaRcYJ9D87LYALfZs9-fBAU6_48TsS8FoC4N-ZTK9JmUQ0BR4ltq8uDqGbZXYwLAE8RQ
 
 management:
   endpoints:

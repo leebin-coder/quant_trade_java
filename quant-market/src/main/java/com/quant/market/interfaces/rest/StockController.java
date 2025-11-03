@@ -117,7 +117,7 @@ public class StockController {
      * PUT /api/stocks/{id}
      */
     @PutMapping("/{id}")
-    public Result<StockDTO> updateStock(@PathVariable Long id, @RequestBody UpdateStockRequest request) {
+    public Result<StockDTO> updateStock(@PathVariable("id") Long id, @RequestBody UpdateStockRequest request) {
         log.info("REST request to update stock: {}", id);
         StockDTO stock = stockService.updateStock(id, request);
         return Result.success(stock);
@@ -128,7 +128,7 @@ public class StockController {
      * GET /api/stocks/{id}
      */
     @GetMapping("/{id}")
-    public Result<StockDTO> getStockById(@PathVariable Long id) {
+    public Result<StockDTO> getStockById(@PathVariable("id") Long id) {
         log.info("REST request to get stock: {}", id);
         StockDTO stock = stockService.getStockById(id);
         return Result.success(stock);
@@ -140,8 +140,8 @@ public class StockController {
      */
     @GetMapping("/{exchange}/{stockCode}")
     public Result<StockDTO> getStockByCode(
-            @PathVariable String exchange,
-            @PathVariable String stockCode) {
+            @PathVariable("exchange") String exchange,
+            @PathVariable("stockCode") String stockCode) {
         log.info("REST request to get stock: {}.{}", exchange, stockCode);
         StockDTO stock = stockService.getStockByCode(exchange.toUpperCase(), stockCode);
         return Result.success(stock);
@@ -153,10 +153,10 @@ public class StockController {
      */
     @GetMapping
     public Result<PageResult<StockDTO>> getStocks(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size,
+            @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         log.info("REST request to get stocks: page={}, size={}, sortBy={}, sortDir={}",
                 page, size, sortBy, sortDir);
 
@@ -186,7 +186,7 @@ public class StockController {
     }
 
     /**
-     * Query stocks by multiple conditions (without pagination)
+     * Query stocks by multiple conditions (with optional pagination)
      * POST /api/stocks/query
      *
      * Features:
@@ -195,9 +195,10 @@ public class StockController {
      * - Multi-select filter by status (LISTED, DELISTED, SUSPENDED)
      * - Multi-select filter by industry
      * - Multi-select filter by exchange (SH, SZ, BJ, HK, US)
-     * - Returns full list without pagination
+     * - Optional pagination (if page and size are provided)
+     * - Returns full list if pagination parameters are not provided
      *
-     * Request body example:
+     * Request body example (without pagination - returns all):
      * {
      *   "listingDateFrom": "2020-01-01",
      *   "listingDateTo": "2023-12-31",
@@ -207,14 +208,31 @@ public class StockController {
      *   "exchanges": ["SH", "SZ"]
      * }
      *
-     * @param request Query conditions
-     * @return List of matching stocks
+     * Request body example (with pagination):
+     * {
+     *   "keyword": "银行",
+     *   "exchanges": ["SH"],
+     *   "page": 0,
+     *   "size": 20,
+     *   "sortBy": "stockCode",
+     *   "sortDir": "asc"
+     * }
+     *
+     * @param request Query conditions (with optional pagination)
+     * @return List of matching stocks or PageResult if pagination is requested
      */
     @PostMapping("/query")
-    public Result<List<StockDTO>> queryStocks(@RequestBody StockQueryRequest request) {
+    public Result<?> queryStocks(@RequestBody StockQueryRequest request) {
         log.info("REST request to query stocks with conditions: {}", request);
-        List<StockDTO> stocks = stockService.queryStocks(request);
-        return Result.success(stocks);
+        Object result = stockService.queryStocks(request);
+
+        if (result instanceof com.quant.common.response.PageResult) {
+            // Return PageResult directly (it already extends Result)
+            return (Result<?>) result;
+        } else {
+            // Return List wrapped in Result
+            return Result.success(result);
+        }
     }
 
     /**
@@ -222,7 +240,7 @@ public class StockController {
      * GET /api/stocks/exchange/{exchange}
      */
     @GetMapping("/exchange/{exchange}")
-    public Result<List<StockDTO>> getStocksByExchange(@PathVariable String exchange) {
+    public Result<List<StockDTO>> getStocksByExchange(@PathVariable("exchange") String exchange) {
         log.info("REST request to get stocks by exchange: {}", exchange);
         List<StockDTO> stocks = stockService.getStocksByExchange(exchange.toUpperCase());
         return Result.success(stocks);
@@ -233,7 +251,7 @@ public class StockController {
      * GET /api/stocks/status/{status}
      */
     @GetMapping("/status/{status}")
-    public Result<List<StockDTO>> getStocksByStatus(@PathVariable String status) {
+    public Result<List<StockDTO>> getStocksByStatus(@PathVariable("status") String status) {
         log.info("REST request to get stocks by status: {}", status);
         List<StockDTO> stocks = stockService.getStocksByStatus(status.toUpperCase());
         return Result.success(stocks);
@@ -244,7 +262,7 @@ public class StockController {
      * GET /api/stocks/industry/{industry}
      */
     @GetMapping("/industry/{industry}")
-    public Result<List<StockDTO>> getStocksByIndustry(@PathVariable String industry) {
+    public Result<List<StockDTO>> getStocksByIndustry(@PathVariable("industry") String industry) {
         log.info("REST request to get stocks by industry: {}", industry);
         List<StockDTO> stocks = stockService.getStocksByIndustry(industry);
         return Result.success(stocks);
@@ -255,7 +273,7 @@ public class StockController {
      * GET /api/stocks/search/name?keyword=xxx
      */
     @GetMapping("/search/name")
-    public Result<List<StockDTO>> searchStocksByName(@RequestParam String keyword) {
+    public Result<List<StockDTO>> searchStocksByName(@RequestParam("keyword") String keyword) {
         log.info("REST request to search stocks by name: {}", keyword);
         List<StockDTO> stocks = stockService.searchStocksByName(keyword);
         return Result.success(stocks);
@@ -266,7 +284,7 @@ public class StockController {
      * GET /api/stocks/search/company?keyword=xxx
      */
     @GetMapping("/search/company")
-    public Result<List<StockDTO>> searchStocksByCompany(@RequestParam String keyword) {
+    public Result<List<StockDTO>> searchStocksByCompany(@RequestParam("keyword") String keyword) {
         log.info("REST request to search stocks by company: {}", keyword);
         List<StockDTO> stocks = stockService.searchStocksByCompany(keyword);
         return Result.success(stocks);
@@ -277,7 +295,7 @@ public class StockController {
      * DELETE /api/stocks/{id}
      */
     @DeleteMapping("/{id}")
-    public Result<Void> deleteStock(@PathVariable Long id) {
+    public Result<Void> deleteStock(@PathVariable("id") Long id) {
         log.info("REST request to delete stock: {}", id);
         stockService.deleteStock(id);
         return Result.success();

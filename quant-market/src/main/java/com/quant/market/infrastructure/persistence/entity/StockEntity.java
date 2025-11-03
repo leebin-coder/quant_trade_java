@@ -4,6 +4,7 @@ import com.quant.market.domain.model.Stock;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Entity
-@Table(name = "t_stock_base")
+@Table(name = "t_stock_basic")
 public class StockEntity {
 
     @Id
@@ -41,6 +42,27 @@ public class StockEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Stock.StockStatus status;
+
+    @Column(name = "latest_price", precision = 18, scale = 4)
+    private BigDecimal latestPrice;
+
+    @Column(name = "prev_close_price", precision = 18, scale = 4)
+    private BigDecimal prevClosePrice;
+
+    @Column(name = "prev_prev_close_price", precision = 18, scale = 4)
+    private BigDecimal prevPrevClosePrice;
+
+    @Column(name = "total_shares", precision = 20, scale = 2)
+    private BigDecimal totalShares;
+
+    @Column(name = "circulating_shares", precision = 20, scale = 2)
+    private BigDecimal circulatingShares;
+
+    @Column(name = "total_market_cap", precision = 18, scale = 2)
+    private BigDecimal totalMarketCap;
+
+    @Column(name = "circulating_market_cap", precision = 18, scale = 2)
+    private BigDecimal circulatingMarketCap;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -72,6 +94,13 @@ public class StockEntity {
                 .listingDate(listingDate)
                 .industry(industry)
                 .status(status)
+                .latestPrice(latestPrice)
+                .prevClosePrice(prevClosePrice)
+                .prevPrevClosePrice(prevPrevClosePrice)
+                .totalShares(totalShares)
+                .circulatingShares(circulatingShares)
+                .totalMarketCap(totalMarketCap)
+                .circulatingMarketCap(circulatingMarketCap)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
@@ -90,6 +119,13 @@ public class StockEntity {
         entity.setListingDate(stock.getListingDate());
         entity.setIndustry(stock.getIndustry());
         entity.setStatus(stock.getStatus());
+        entity.setLatestPrice(stock.getLatestPrice());
+        entity.setPrevClosePrice(stock.getPrevClosePrice());
+        entity.setPrevPrevClosePrice(stock.getPrevPrevClosePrice());
+        entity.setTotalShares(stock.getTotalShares());
+        entity.setCirculatingShares(stock.getCirculatingShares());
+        entity.setTotalMarketCap(stock.getTotalMarketCap());
+        entity.setCirculatingMarketCap(stock.getCirculatingMarketCap());
         entity.setCreatedAt(stock.getCreatedAt());
         entity.setUpdatedAt(stock.getUpdatedAt());
         return entity;

@@ -128,7 +128,7 @@ cd quant-strategy && mvn spring-boot:run
 open http://localhost:8848/nacos
 
 # 检查用户服务健康状态
-curl http://localhost:8081/actuator/health
+curl http://localhost:8081/api/actuator/health
 
 # 通过网关访问用户服务
 curl http://localhost:8080/api/user/actuator/health

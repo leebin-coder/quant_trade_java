@@ -37,7 +37,7 @@
 ```
 前端                    网关                    User Service
  │                       │                          │
- ├─POST /auth/login─────>│                          │
+ ├─POST /api/auth/login─>│                          │
  │ {phone, code}         │                          │
  │                       ├─(白名单,不验证Token)────>│
  │                       │                          │
@@ -109,7 +109,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
     // 白名单路径
     private static final List<String> WHITELIST_PATHS = Arrays.asList(
-        "/auth/**",      // 认证接口
+        "/api/auth/**",      // 认证接口
         "/actuator/**",  // 监控接口
         "/error",
         "/favicon.ico"
@@ -265,13 +265,13 @@ spring:
         - id: auth-service
           uri: lb://quant-user
           predicates:
-            - Path=/auth/**
+            - Path=/api/auth/**
 
         # 受保护路由
         - id: user-service
           uri: lb://quant-user
           predicates:
-            - Path=/user/**
+            - Path=/api/user/**
 
         - id: market-service
           uri: lb://quant-market
@@ -286,23 +286,23 @@ jwt:
 
 ## 白名单路径
 
-| 路径模式 | 说明 | 目标服务 |
-|---------|------|----------|
-| `/auth/**` | 登录、发送验证码 | quant-user |
+| 路径模式           | 说明 | 目标服务 |
+|----------------|------|----------|
+| `/api/auth/**` | 登录、发送验证码 | quant-user |
 | `/actuator/**` | 健康检查、监控 | 所有服务 |
-| `/error` | 错误页面 | - |
+| `/error`       | 错误页面 | - |
 | `/favicon.ico` | 网站图标 | - |
 
 ## 受保护路径
 
 所有**不在白名单**中的路径都需要提供有效的 JWT Token：
 
-| 路径模式 | 说明 | 目标服务 |
-|---------|------|----------|
-| `/user/**` | 用户管理 | quant-user |
-| `/api/stocks/**` | 股票查询 | quant-market |
-| `/api/trade/**` | 交易管理 | quant-trade |
-| `/api/risk/**` | 风控管理 | quant-risk |
+| 路径模式               | 说明 | 目标服务 |
+|--------------------|------|----------|
+| `/api/user/**`     | 用户管理 | quant-user |
+| `/api/stocks/**`   | 股票查询 | quant-market |
+| `/api/trade/**`    | 交易管理 | quant-trade |
+| `/api/risk/**`     | 风控管理 | quant-risk |
 | `/api/strategy/**` | 策略管理 | quant-strategy |
 
 ## 下游服务获取用户信息
@@ -373,7 +373,7 @@ public class StockService {
 
 ```java
 private static final List<String> WHITELIST_PATHS = Arrays.asList(
-    "/auth/**",
+    "/api/auth/**",
     "/actuator/**",
     "/public/**",    // 新增公共接口
     "/error",

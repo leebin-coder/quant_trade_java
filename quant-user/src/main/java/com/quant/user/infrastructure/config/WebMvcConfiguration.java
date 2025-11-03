@@ -20,7 +20,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                        "/auth/**",           // Exclude authentication endpoints
+                        "/api/auth/**",           // Exclude authentication endpoints
                         "/actuator/**",       // Exclude actuator endpoints
                         "/error"              // Exclude error endpoint
                 );

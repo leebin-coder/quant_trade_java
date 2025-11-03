@@ -49,4 +49,24 @@ public class StockQueryRequest {
      * Available values: SH, SZ, BJ, HK, US
      */
     private List<String> exchanges;
+
+    /**
+     * Page number (0-based), null means no pagination (return all)
+     */
+    private Integer page;
+
+    /**
+     * Page size, null means no pagination (return all)
+     */
+    private Integer size;
+
+    /**
+     * Sort by field, default: createdAt
+     */
+    private String sortBy;
+
+    /**
+     * Sort direction (asc/desc), default: desc
+     */
+    private String sortDir;
 }
