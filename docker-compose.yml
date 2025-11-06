@@ -3,17 +3,15 @@ version: '3.8'
 services:
   # Nacos Service Registry and Config Center
   nacos:
-    image: nacos/nacos-server:v2.3.2-slim
+    image: nacos/nacos-server:v2.3.2
     container_name: quant-nacos
     environment:
       MODE: standalone
       PREFER_HOST_MODE: hostname
       SPRING_DATASOURCE_PLATFORM: postgresql
-      NACOS_DATABASE_HOST: ${DB_HOST:-host.docker.internal}
-      NACOS_DATABASE_PORT: ${DB_PORT:-5432}
-      NACOS_DATABASE_NAME: ${NACOS_DB_NAME:-nacos_config}
-      NACOS_DATABASE_USER: ${DB_USERNAME:-postgres}
-      NACOS_DATABASE_PASSWORD: ${DB_PASSWORD:-postgres}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST:-host.docker.internal}:${DB_PORT:-5432}/${NACOS_DB_NAME:-nacos_config}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-libin}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-libin122351}
       JVM_XMS: 512m
       JVM_XMX: 512m
     ports:
