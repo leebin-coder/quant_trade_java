@@ -10,7 +10,7 @@ services:
       MODE: standalone
       PREFER_HOST_MODE: hostname
       SPRING_DATASOURCE_PLATFORM: postgresql
-      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST:-localhost}:${DB_PORT:-5432}/${NACOS_DB_NAME:-nacos_config}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST:-host.docker.internal}:${DB_PORT:-5432}/${NACOS_DB_NAME:-nacos_config}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-libin}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-libin122351}
       JVM_XMS: 512m
@@ -18,8 +18,6 @@ services:
     ports:
       - "8848:8848"
       - "9848:9848"
-    extra_hosts:
-      - "localhost:host-gateway"
     networks:
       - quant-network
     healthcheck:
@@ -59,14 +57,12 @@ services:
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: ${DB_HOST:-localhost}
+      DB_HOST: ${DB_HOST:-host.docker.internal}
       DB_PORT: ${DB_PORT:-5432}
       DB_NAME: ${DB_NAME:-quant_trade}
       DB_USERNAME: ${DB_USERNAME:-libin}
       DB_PASSWORD: ${DB_PASSWORD:-libin122351}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
-    extra_hosts:
-      - "localhost:host-gateway"
     depends_on:
       nacos:
         condition: service_healthy
@@ -85,14 +81,12 @@ services:
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: ${DB_HOST:-localhost}
+      DB_HOST: ${DB_HOST:-host.docker.internal}
       DB_PORT: ${DB_PORT:-5432}
       DB_NAME: ${DB_NAME:-quant_trade}
       DB_USERNAME: ${DB_USERNAME:-libin}
       DB_PASSWORD: ${DB_PASSWORD:-libin122351}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
-    extra_hosts:
-      - "localhost:host-gateway"
     depends_on:
       nacos:
         condition: service_healthy
@@ -111,14 +105,12 @@ services:
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: ${DB_HOST:-localhost}
+      DB_HOST: ${DB_HOST:-host.docker.internal}
       DB_PORT: ${DB_PORT:-5432}
       DB_NAME: ${DB_NAME:-quant_trade}
       DB_USERNAME: ${DB_USERNAME:-libin}
       DB_PASSWORD: ${DB_PASSWORD:-libin122351}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
-    extra_hosts:
-      - "localhost:host-gateway"
     depends_on:
       nacos:
         condition: service_healthy
@@ -137,14 +129,12 @@ services:
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: ${DB_HOST:-localhost}
+      DB_HOST: ${DB_HOST:-host.docker.internal}
       DB_PORT: ${DB_PORT:-5432}
       DB_NAME: ${DB_NAME:-quant_trade}
       DB_USERNAME: ${DB_USERNAME:-libin}
       DB_PASSWORD: ${DB_PASSWORD:-libin122351}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
-    extra_hosts:
-      - "localhost:host-gateway"
     depends_on:
       nacos:
         condition: service_healthy
@@ -163,14 +153,12 @@ services:
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: ${DB_HOST:-localhost}
+      DB_HOST: ${DB_HOST:-host.docker.internal}
       DB_PORT: ${DB_PORT:-5432}
       DB_NAME: ${DB_NAME:-quant_trade}
       DB_USERNAME: ${DB_USERNAME:-libin}
       DB_PASSWORD: ${DB_PASSWORD:-libin122351}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
-    extra_hosts:
-      - "localhost:host-gateway"
     depends_on:
       nacos:
         condition: service_healthy
