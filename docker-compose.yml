@@ -3,8 +3,9 @@ version: '3.8'
 services:
   # Nacos Service Registry and Config Center
   nacos:
-    image: nacos/nacos-server:v2.3.2
+    image: nacos/nacos-server:v2.4.3
     container_name: quant-nacos
+    platform: linux/amd64
     environment:
       MODE: standalone
       PREFER_HOST_MODE: hostname
