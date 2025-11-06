@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings
+
+# Build outputs (keep only what's needed for multi-stage builds)
+*/target
+!*/target/*.jar
+**/target/classes
+**/target/test-classes
+**/target/maven-archiver
+**/target/maven-status
+
+# Maven
+.m2
+
+# Logs
+*.log
+logs
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+README*
+docs
+
+# Docker
+docker-compose*.yml
+Dockerfile
+.dockerignore
+
+# Test files
+**/src/test
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
