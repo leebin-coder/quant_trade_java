@@ -4,13 +4,12 @@ Quantitative Trading Platform based on Microservices Architecture
 
 ## Technology Stack
 
-- Java 8
-- Spring Boot 2.3.12
-- Spring Cloud Hoxton.SR12
-- Spring Cloud Alibaba 2.2.9
-- Nacos 2.1.0 (Service Discovery & Config Center)
-- PostgreSQL 12
-- RabbitMQ 3
+- Java 21
+- Spring Boot 3.x
+- Spring Cloud
+- Spring Cloud Alibaba
+- Nacos (Service Discovery & Config Center)
+- PostgreSQL
 - Maven 3.9
 - Docker
 
@@ -31,7 +30,8 @@ quant-trade-java/
 ├── quant-market/              # Market Data Service (Port: 8084)
 ├── quant-strategy/            # Strategy Service (Port: 8085)
 ├── quant-database/            # Database module (JPA)
-├── quant-message/             # Message module (RabbitMQ)
+├── quant-cache/               # Cache module
+├── quant-message/             # Message module
 └── quant-storage/             # Storage module
 ```
 
@@ -46,125 +46,40 @@ Each business service follows DDD layering:
 
 ## Prerequisites
 
-- JDK 8
+- JDK 21
 - Maven 3.9+
 - Docker and Docker Compose
-- PostgreSQL 12+ (running on localhost:5432)
 
-## Database Setup
+## Quick Start
 
-This project uses an external PostgreSQL database. Connection details:
-
-- **Host**: localhost:5432
-- **Database**: quant_trade
-- **User**: libin
-- **Password**: libin122351
-
-### Initialize Database
-
-Create the database (if not exists):
-
-```bash
-./init-database.sh
-```
-
-Or manually:
-
-```bash
-psql -h localhost -p 5432 -U libin -c "CREATE DATABASE quant_trade;"
-```
-
-**Note**: Database tables will be automatically created by Flyway migration scripts when services start for the first time.
-
-## Build
-
-Build all modules:
+### 1. Build Project
 
 ```bash
 cd quant-parent
 mvn clean install
 ```
 
-## Run with Docker Compose
-
-Start all services (including infrastructure and business services):
+### 2. Run with Docker Compose
 
 ```bash
+# Start all services
 docker-compose up -d
-```
 
-Stop all services:
+# View logs
+docker-compose logs -f
 
-```bash
+# Stop all services
 docker-compose down
-```
-
-## Local Development
-
-### 1. Initialize Database
-
-```bash
-./init-database.sh
-```
-
-This will create the `quant_trade` database if it doesn't exist.
-
-### 2. Start Infrastructure Services
-
-```bash
-./start-infra.sh
-```
-
-This will start:
-- RabbitMQ (Message Broker)
-- Nacos (Service Registry & Config Center)
-
-**Note**: PostgreSQL is not started in Docker as we use the external PostgreSQL instance on localhost:5432.
-
-### 3. Build Project
-
-```bash
-cd quant-parent
-mvn clean install -DskipTests
-```
-
-### 4. Run Services in IDE
-
-Run the following main classes in your IDE:
-- `com.quant.gateway.GatewayApplication` (Port 8080)
-- `com.quant.user.UserApplication` (Port 8081)
-- `com.quant.trade.TradeApplication` (Port 8082)
-- `com.quant.risk.RiskApplication` (Port 8083)
-- `com.quant.market.MarketApplication` (Port 8084)
-- `com.quant.strategy.StrategyApplication` (Port 8085)
-
-**On first startup**, Flyway will automatically create all database tables from migration scripts located in:
-- `quant-user/src/main/resources/db/migration/`
-- `quant-trade/src/main/resources/db/migration/`
-- `quant-risk/src/main/resources/db/migration/`
-- `quant-market/src/main/resources/db/migration/`
-- `quant-strategy/src/main/resources/db/migration/`
-
-### 5. Stop Infrastructure Services
-
-```bash
-./stop-infra.sh
 ```
 
 ## Services
 
 ### Infrastructure Services
 
-- **PostgreSQL**: `localhost:5432` (External)
+- **PostgreSQL**: `postgres:5432` (Container)
   - Database: `quant_trade`
-  - Username: `libin`
-  - Password: `libin122351`
-  - Connection test: `psql -h localhost -p 5432 -U libin -d quant_trade`
-
-- **RabbitMQ**: `localhost:5672`
-  - Management UI: http://localhost:15672
-  - Username: `guest`
-  - Password: `guest`
+  - Username: `postgres`
+  - Password: `postgres`
 
 - **Nacos**: http://localhost:8848/nacos
   - Username: `nacos`
@@ -203,42 +118,29 @@ curl -X POST http://localhost:8080/api/user/user \
   -d '{"username":"test","email":"test@example.com"}'
 ```
 
-## Configuration
+## Docker
 
-### Environment Variables
+Each service has its own Dockerfile with multi-stage build:
+- Build stage: Compile Java code with Maven
+- Runtime stage: Run with JRE (Alpine based)
 
-Environment variables are configured in `.env` file:
-
-```env
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=quant_trade
-DB_USERNAME=libin
-DB_PASSWORD=libin122351
-
-# RabbitMQ Configuration
-RABBITMQ_HOST=localhost
-RABBITMQ_PORT=5672
-RABBITMQ_USERNAME=guest
-RABBITMQ_PASSWORD=guest
-
-# Nacos Configuration
-NACOS_SERVER=localhost:8848
-NACOS_NAMESPACE=public
-```
-
-### Nacos Configuration
-
-Services automatically register with Nacos on startup. You can view and manage services in the Nacos console:
-
-http://localhost:8848/nacos
-
-Default credentials:
-- Username: `nacos`
-- Password: `nacos`
+Services are configured in `docker-compose.yml` with:
+- Health checks
+- Auto-restart policies
+- Network isolation
+- Volume persistence
 
 ## Development
+
+### Local Development (without Docker)
+
+1. Start PostgreSQL and Nacos locally
+2. Build the project:
+   ```bash
+   cd quant-parent
+   mvn clean install -DskipTests
+   ```
+3. Run services in your IDE
 
 ### Add New Service
 
@@ -247,35 +149,60 @@ Default credentials:
 3. Add Nacos discovery and config dependencies
 4. Configure `application.yml` with Nacos settings
 5. Add routing rules in API Gateway
-6. Add service to `docker-compose.yml`
-
-### Database Migration
-
-Use Flyway or Liquibase for database schema management (to be implemented).
+6. Create Dockerfile for the service
+7. Add service to `docker-compose.yml`
 
 ## Troubleshooting
 
 ### Port Already in Use
 
-If you encounter port conflicts, modify the port in each service's `application.yml`.
-
-### Nacos Connection Failed
-
-Ensure Nacos is running:
 ```bash
-docker ps | grep quant-nacos
+# Check what's using the port
+lsof -i :8080
+
+# Stop the service using docker-compose
+docker-compose down
 ```
 
-Check Nacos logs:
+### View Service Logs
+
 ```bash
-docker logs quant-nacos
+# View all logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f gateway
+docker-compose logs -f user-service
 ```
 
-### Service Not Registered
+### Database Connection Issues
+
+```bash
+# Check if PostgreSQL is running
+docker-compose ps postgres
+
+# View PostgreSQL logs
+docker-compose logs postgres
+
+# Connect to PostgreSQL container
+docker exec -it quant-postgres psql -U postgres -d quant_trade
+```
+
+### Service Not Registered in Nacos
 
 1. Check Nacos console: http://localhost:8848/nacos
-2. Verify `NACOS_SERVER` environment variable
-3. Check service logs for connection errors
+2. Check service logs: `docker-compose logs <service-name>`
+3. Verify network connectivity between containers
+
+### Clean Restart
+
+```bash
+# Stop and remove all containers and volumes
+docker-compose down -v
+
+# Rebuild and restart
+docker-compose up -d --build
+```
 
 ## License
 
