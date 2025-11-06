@@ -4,18 +4,22 @@ FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 WORKDIR /build
 
 # Copy parent pom and quant-parent first for better caching
-COPY ../pom.xml .
-COPY ../quant-parent ./quant-parent
+COPY pom.xml .
+COPY quant-parent ./quant-parent
 
-# Copy common modules
-COPY ../quant-common ./quant-common
+# Copy all common modules
+COPY quant-common ./quant-common
+COPY quant-database ./quant-database
+COPY quant-cache ./quant-cache
+COPY quant-message ./quant-message
+COPY quant-storage ./quant-storage
 
 # Copy current service
-COPY pom.xml ./quant-strategy/pom.xml
-COPY src ./quant-strategy/src
+COPY quant-strategy ./quant-strategy
 
 # Build the application (skip tests for faster builds)
-RUN mvn clean package -pl quant-strategy -am -DskipTests
+RUN cd quant-parent && mvn clean install -DskipTests && \
+    cd /build && mvn clean package -pl quant-strategy -am -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

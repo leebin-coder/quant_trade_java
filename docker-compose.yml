@@ -1,26 +1,6 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: quant-postgres
-    environment:
-      POSTGRES_DB: quant_trade
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - quant-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   # Nacos Service Registry and Config Center
   nacos:
     image: nacos/nacos-server:v2.3.2-slim
@@ -28,13 +8,19 @@ services:
     environment:
       MODE: standalone
       PREFER_HOST_MODE: hostname
+      SPRING_DATASOURCE_PLATFORM: postgresql
+      NACOS_DATABASE_HOST: ${DB_HOST:-host.docker.internal}
+      NACOS_DATABASE_PORT: ${DB_PORT:-5432}
+      NACOS_DATABASE_NAME: ${NACOS_DB_NAME:-nacos_config}
+      NACOS_DATABASE_USER: ${DB_USERNAME:-postgres}
+      NACOS_DATABASE_PASSWORD: ${DB_PASSWORD:-postgres}
       JVM_XMS: 512m
       JVM_XMX: 512m
     ports:
       - "8848:8848"
       - "9848:9848"
-    volumes:
-      - nacos_data:/home/nacos/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - quant-network
     healthcheck:
@@ -42,12 +28,13 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    restart: unless-stopped
 
   # API Gateway
   gateway:
     build:
-      context: ./quant-gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: quant-gateway/Dockerfile
     container_name: quant-gateway
     ports:
       - "8080:8080"
@@ -65,136 +52,134 @@ services:
   # User Service
   user-service:
     build:
-      context: ./quant-user
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: quant-user/Dockerfile
     container_name: quant-user
     ports:
       - "8081:8081"
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: quant_trade
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-quant_trade}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       nacos:
         condition: service_healthy
     networks:
       - quant-network
-    restart: on-failure
+    restart: unless-stopped
 
   # Trade Service
   trade-service:
     build:
-      context: ./quant-trade
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: quant-trade/Dockerfile
     container_name: quant-trade
     ports:
       - "8082:8082"
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: quant_trade
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-quant_trade}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       nacos:
         condition: service_healthy
     networks:
       - quant-network
-    restart: on-failure
+    restart: unless-stopped
 
   # Risk Service
   risk-service:
     build:
-      context: ./quant-risk
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: quant-risk/Dockerfile
     container_name: quant-risk
     ports:
       - "8083:8083"
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: quant_trade
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-quant_trade}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       nacos:
         condition: service_healthy
     networks:
       - quant-network
-    restart: on-failure
+    restart: unless-stopped
 
   # Market Service
   market-service:
     build:
-      context: ./quant-market
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: quant-market/Dockerfile
     container_name: quant-market
     ports:
       - "8084:8084"
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: quant_trade
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-quant_trade}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       nacos:
         condition: service_healthy
     networks:
       - quant-network
-    restart: on-failure
+    restart: unless-stopped
 
   # Strategy Service
   strategy-service:
     build:
-      context: ./quant-strategy
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: quant-strategy/Dockerfile
     container_name: quant-strategy
     ports:
       - "8085:8085"
     environment:
       NACOS_SERVER: nacos:8848
       NACOS_NAMESPACE: public
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: quant_trade
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-quant_trade}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       nacos:
         condition: service_healthy
     networks:
       - quant-network
-    restart: on-failure
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
-  nacos_data:
 
 networks:
   quant-network:

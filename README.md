@@ -46,44 +46,72 @@ Each business service follows DDD layering:
 
 ## Prerequisites
 
-- JDK 21
-- Maven 3.9+
 - Docker and Docker Compose
+- PostgreSQL (external, not in Docker)
+
+**Note:** No need to install Java or Maven locally - everything builds in Docker!
 
 ## Quick Start
 
-### 1. Build Project
+### 1. Initialize PostgreSQL Database
 
 ```bash
-cd quant-parent
-mvn clean install
+# Connect to your PostgreSQL server
+psql -h <your-postgres-host> -U libin -f docker/init-db.sql
 ```
 
-### 2. Run with Docker Compose
+This creates two databases:
+- `quant_trade` - Application data
+- `nacos_config` - Nacos configuration
+
+### 2. Configure Environment
 
 ```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
+cp .env.example .env
+vim .env  # Edit database connection settings
 ```
+
+Update `.env` with your PostgreSQL configuration:
+```env
+DB_HOST=192.168.1.100    # Your PostgreSQL server IP
+DB_PORT=5432
+DB_NAME=quant_trade
+DB_USERNAME=libin
+DB_PASSWORD=libin122351
+NACOS_DB_NAME=nacos_config
+```
+
+### 3. Start Services
+
+```bash
+docker-compose up -d --build
+```
+
+### 4. Verify
+
+```bash
+# Check Nacos
+curl http://localhost:8848/nacos/
+
+# Check Gateway
+curl http://localhost:8080/actuator/health
+```
+
+For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ## Services
 
 ### Infrastructure Services
 
-- **PostgreSQL**: `postgres:5432` (Container)
-  - Database: `quant_trade`
-  - Username: `postgres`
-  - Password: `postgres`
+- **PostgreSQL**: External (not in Docker)
+  - Application Database: `quant_trade`
+  - Nacos Database: `nacos_config`
+  - Configure in `.env` file
 
 - **Nacos**: http://localhost:8848/nacos
   - Username: `nacos`
   - Password: `nacos`
+  - Data stored in PostgreSQL (persistent)
 
 ### Business Services
 
