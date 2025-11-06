@@ -13,7 +13,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://quant_postgres:5432/nacos_config
       SPRING_DATASOURCE_USERNAME: libin
       SPRING_DATASOURCE_PASSWORD: libin122351
-      # Nacos 3.x Authentication (Required)
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      # Nacos 3.x Authentication
       NACOS_AUTH_ENABLE: "true"
       NACOS_AUTH_TOKEN: VGhpc0lzTXlDdXN0b21TZWNyZXRLZXkwMTIzNDU2Nzg5QUJDREVGNDg5Nzg5Nzg5Nzg5Nzg5Nzg5Nzg5
       NACOS_AUTH_IDENTITY_KEY: nacos
