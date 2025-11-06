@@ -18,8 +18,14 @@ COPY quant-storage ./quant-storage
 COPY quant-risk ./quant-risk
 
 # Build the application (skip tests for faster builds)
-RUN cd quant-parent && mvn clean install -DskipTests && \
-    cd /build && mvn clean package -pl quant-risk -am -DskipTests
+# Install parent POM, build common modules, then build risk service
+RUN cd quant-parent && mvn clean install -N -DskipTests && \
+    cd /build/quant-common && mvn clean install -DskipTests && \
+    cd /build/quant-database && mvn clean install -DskipTests && \
+    cd /build/quant-cache && mvn clean install -DskipTests && \
+    cd /build/quant-message && mvn clean install -DskipTests && \
+    cd /build/quant-storage && mvn clean install -DskipTests && \
+    cd /build/quant-risk && mvn clean package -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
