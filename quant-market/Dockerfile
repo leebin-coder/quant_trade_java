@@ -3,20 +3,9 @@ FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 
 WORKDIR /build
 
-# Copy all pom files first for better dependency caching
+# Copy all project files
 COPY pom.xml .
-COPY quant-parent/pom.xml ./quant-parent/
-COPY quant-common/pom.xml ./quant-common/
-COPY quant-database/pom.xml ./quant-database/
-COPY quant-cache/pom.xml ./quant-cache/
-COPY quant-message/pom.xml ./quant-message/
-COPY quant-storage/pom.xml ./quant-storage/
-COPY quant-market/pom.xml ./quant-market/
-
-# Download dependencies (this layer will be cached if pom.xml doesn't change)
-RUN cd quant-parent && mvn dependency:go-offline -DskipTests || true
-
-# Now copy the actual source code
+COPY quant-parent ./quant-parent
 COPY quant-common ./quant-common
 COPY quant-database ./quant-database
 COPY quant-cache ./quant-cache
@@ -24,14 +13,8 @@ COPY quant-message ./quant-message
 COPY quant-storage ./quant-storage
 COPY quant-market ./quant-market
 
-# Build the application
-RUN cd quant-parent && mvn clean install -N -DskipTests && \
-    cd /build/quant-common && mvn clean install -DskipTests && \
-    cd /build/quant-database && mvn clean install -DskipTests && \
-    cd /build/quant-cache && mvn clean install -DskipTests && \
-    cd /build/quant-message && mvn clean install -DskipTests && \
-    cd /build/quant-storage && mvn clean install -DskipTests && \
-    cd /build/quant-market && mvn clean package -DskipTests
+# Build from parent using reactor (builds all modules in correct order)
+RUN cd quant-parent && mvn clean package -DskipTests -pl com.quant:quant-market -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
