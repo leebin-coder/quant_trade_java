@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: quant-strategy
+  config:
+    import: optional:nacos:${spring.application.name}.${spring.cloud.nacos.config.file-extension}
   cloud:
     nacos:
       discovery:
