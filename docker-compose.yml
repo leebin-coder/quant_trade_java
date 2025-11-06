@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Nacos Service Registry and Config Center
   nacos:

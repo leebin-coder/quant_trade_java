@@ -16,6 +16,7 @@
     <modules>
         <module>../quant-common</module>
         <module>../quant-database</module>
+        <module>../quant-cache</module>
         <module>../quant-message</module>
         <module>../quant-storage</module>
         <module>../quant-gateway</module>
@@ -150,6 +151,11 @@
             <dependency>
                 <groupId>com.quant</groupId>
                 <artifactId>quant-database</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.quant</groupId>
+                <artifactId>quant-cache</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
