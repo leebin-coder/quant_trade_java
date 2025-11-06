@@ -90,8 +90,12 @@ docker-compose up -d --build
 ### 4. Verify
 
 ```bash
-# Check Nacos
-curl http://localhost:8848/nacos/
+# Check Nacos Console (访问控制台)
+curl http://localhost:8888/nacos/
+# Browser: http://localhost:8888/nacos (nacos/nacos)
+
+# Check Nacos Server (检查服务端)
+curl http://localhost:8848/nacos/v1/console/health/readiness
 
 # Check Gateway
 curl http://localhost:8080/actuator/health
@@ -108,9 +112,12 @@ For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
   - Nacos Database: `nacos_config`
   - Configure in `.env` file
 
-- **Nacos**: http://localhost:8848/nacos
+- **Nacos**:
+  - Console UI: http://localhost:8888/nacos (控制台端口)
+  - Server Port: 8848 (服务端口 - gRPC)
   - Username: `nacos`
   - Password: `nacos`
+  - Version: 3.1.0 (鉴权已启用)
   - Data stored in PostgreSQL (persistent)
 
 ### Business Services

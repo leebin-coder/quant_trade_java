@@ -117,9 +117,12 @@ docker-compose ps
 ### 步骤 4: 验证部署
 
 ```bash
-# 检查 Nacos
-curl http://localhost:8848/nacos/
-# 访问 Nacos 控制台: http://localhost:8848/nacos (nacos/nacos)
+# 检查 Nacos 控制台 (Console UI - 独立端口)
+curl http://localhost:8888/nacos/
+# 浏览器访问: http://localhost:8888/nacos (nacos/nacos)
+
+# 检查 Nacos 服务端 (Server API)
+curl http://localhost:8848/nacos/v1/console/health/readiness
 
 # 检查 Gateway
 curl http://localhost:8080/actuator/health
@@ -450,15 +453,24 @@ docker-compose logs -f nacos --tail=100
 
 ### Nacos 监控
 
-访问 Nacos 控制台: http://localhost:8848/nacos
+访问 Nacos 控制台: http://localhost:8888/nacos
 
+**端口说明：**
+- **8888**: 控制台 UI 端口（Web界面，避免与Gateway 8080冲突）
+- **8848**: 服务端口（gRPC/HTTP API，微服务注册发现）
+- **9848**: gRPC 附加端口
+
+**登录信息：**
 - 用户名: `nacos`
 - 密码: `nacos`
+- 版本: `3.1.0`
+- 鉴权: 已启用（使用自动生成的Token）
 
-可以查看：
+**功能：**
 - 服务注册状态
 - 配置管理
 - 集群状态
+- 命名空间管理
 
 ## 安全建议
 
