@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Nacos Service Registry and Config Center
   nacos:
-    image: nacos/nacos-server:v2.3.2
+    image: nacos/nacos-server:v2.4.1
     container_name: quant-nacos
     platform: linux/arm64  # 优化ARM64性能
     environment:
