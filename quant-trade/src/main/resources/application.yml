@@ -15,6 +15,15 @@ spring:
         server-addr: ${NACOS_SERVER:localhost:8848}
         namespace: ${NACOS_NAMESPACE:public}
         file-extension: yml
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:quant_trade}
+    username: ${DB_USERNAME:libin}
+    password: ${DB_PASSWORD:libin122351}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
 
 management:
   endpoints:
