@@ -16,8 +16,7 @@ COPY quant-storage ./quant-storage
 COPY quant-strategy ./quant-strategy
 
 # 设置 Maven 内存和超时参数
-ENV MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
-
+ENV MAVEN_OPTS="-Xmx1024m -Dmaven.wagon.http.retryHandler.count=3"
 
 # Build shared libraries first, then build the service
 RUN cd quant-parent && mvn clean install -DskipTests && \
