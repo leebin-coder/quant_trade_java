@@ -3,7 +3,7 @@ FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 
 WORKDIR /build
 
-# Copy all project files
+# Copy parent and shared library modules
 COPY pom.xml .
 COPY quant-parent ./quant-parent
 COPY quant-common ./quant-common
@@ -11,10 +11,13 @@ COPY quant-database ./quant-database
 COPY quant-cache ./quant-cache
 COPY quant-message ./quant-message
 COPY quant-storage ./quant-storage
+
+# Copy current service
 COPY quant-gateway ./quant-gateway
 
-# Build from parent using reactor (builds all modules in correct order)
-RUN cd quant-parent && mvn clean package -DskipTests -pl com.quant:quant-gateway -am
+# Build shared libraries first, then build the service
+RUN cd quant-parent && mvn clean install -DskipTests && \
+    cd /build/quant-gateway && mvn clean package -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

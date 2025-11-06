@@ -14,17 +14,14 @@
     <description>Quant Trade Parent Project</description>
 
     <modules>
+        <!-- Shared library modules only -->
         <module>../quant-common</module>
         <module>../quant-database</module>
         <module>../quant-cache</module>
         <module>../quant-message</module>
         <module>../quant-storage</module>
-        <module>../quant-gateway</module>
-        <module>../quant-user</module>
-        <module>../quant-trade</module>
-        <module>../quant-risk</module>
-        <module>../quant-market</module>
-        <module>../quant-strategy</module>
+        <!-- Service modules are not included here for Docker build optimization -->
+        <!-- Each service builds independently with its dependencies -->
     </modules>
 
     <properties>
