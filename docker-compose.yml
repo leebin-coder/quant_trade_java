@@ -3,9 +3,9 @@ version: '3.8'
 services:
   # Nacos Service Registry and Config Center
   nacos:
-    image: nacos/nacos-server:v3.1.0
+    image: nacos/nacos-server:v2.3.2
     container_name: quant-nacos
-    platform: linux/amd64
+    platform: linux/arm64  # 优化ARM64性能
     environment:
       MODE: standalone
       PREFER_HOST_MODE: hostname
@@ -14,11 +14,8 @@ services:
       SPRING_DATASOURCE_USERNAME: libin
       SPRING_DATASOURCE_PASSWORD: libin122351
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
-      # Nacos 3.x Authentication
-      NACOS_AUTH_ENABLE: "true"
-      NACOS_AUTH_TOKEN: VGhpc0lzTXlDdXN0b21TZWNyZXRLZXkwMTIzNDU2Nzg5QUJDREVGNDg5Nzg5Nzg5Nzg5Nzg5Nzg5Nzg5
-      NACOS_AUTH_IDENTITY_KEY: nacos
-      NACOS_AUTH_IDENTITY_VALUE: nacos
+      # Nacos 2.x Authentication
+      NACOS_AUTH_ENABLE: "false"
       # JVM Options
       JVM_XMS: 512m
       JVM_XMX: 512m

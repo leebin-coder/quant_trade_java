@@ -117,8 +117,9 @@ For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
   - Server Port: 8848 (服务端口 - gRPC)
   - Username: `nacos`
   - Password: `nacos`
-  - Version: 3.1.0 (鉴权已启用)
+  - Version: 2.3.2 (鉴权已启用, ARM64 原生)
   - Data stored in PostgreSQL (persistent)
+  - Resources: 2G memory limit, 1G reserved
 
 ### Business Services
 
