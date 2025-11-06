@@ -179,8 +179,6 @@ services:
       - quant-network
     restart: unless-stopped
 
-volumes:
-
 networks:
   quant-network:
     driver: bridge
