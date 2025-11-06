@@ -168,4 +168,4 @@ services:
 
 networks:
   quant-network:
-    driver: bridge
+    external: true
