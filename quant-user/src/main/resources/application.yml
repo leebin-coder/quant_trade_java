@@ -18,8 +18,8 @@ spring:
         file-extension: yml
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:quant_trade}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
+    username: ${POSTGRES_USER:libin}
+    password: ${POSTGRES_PASSWORD:libin122351}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
