@@ -9,11 +9,7 @@ services:
     environment:
       MODE: standalone
       PREFER_HOST_MODE: hostname
-      SPRING_DATASOURCE_PLATFORM: postgresql
-      SPRING_DATASOURCE_URL: jdbc:postgresql://quant_postgres:5432/nacos_config
-      SPRING_DATASOURCE_USERNAME: libin
-      SPRING_DATASOURCE_PASSWORD: libin122351
-      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      # 使用嵌入式数据库 (Derby)
       # Nacos 2.x Authentication
       NACOS_AUTH_ENABLE: "false"
       # JVM Options
@@ -21,6 +17,8 @@ services:
       JVM_XMX: 512m
       # Set console port to 8888 to avoid conflict with Gateway 8080
       JAVA_OPT_EXT: "-Dnacos.console.port=8888"
+    volumes:
+      - nacos-data:/home/nacos/data
     ports:
       - "8848:8848"
       - "9848:9848"
@@ -176,3 +174,7 @@ services:
 networks:
   quant-network:
     external: true
+
+volumes:
+  nacos-data:
+    driver: local
