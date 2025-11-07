@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.quant</groupId>
-    <artifactId>quant-trade-java</artifactId>
+    <artifactId>quant_trade_java</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 

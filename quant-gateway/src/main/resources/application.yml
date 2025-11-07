@@ -53,11 +53,27 @@ spring:
           filters:
             - StripPrefix=1
 
-        # Market service routes
-        - id: market-service
+        # Market service routes - stocks
+        - id: market-service-stocks
           uri: lb://quant-market
           predicates:
             - Path=/api/stocks/**
+          filters:
+            - StripPrefix=0
+
+        # Market service routes - stock companies
+        - id: market-service-companies
+          uri: lb://quant-market
+          predicates:
+            - Path=/api/stock-companies/**
+          filters:
+            - StripPrefix=0
+
+        # Market service routes - stock daily
+        - id: market-service-daily
+          uri: lb://quant-market
+          predicates:
+            - Path=/api/stock-daily/**
           filters:
             - StripPrefix=0
 
