@@ -50,21 +50,45 @@ public class StockController {
      *
      * Features:
      * - Asynchronous processing (non-blocking)
-     * - Automatic exchange detection from stock code
      * - Skips duplicates automatically
      * - Returns immediately with task accepted message
      * - Batch result will be logged server-side
+     * - Only exchange and stockCode are required, all other fields are optional
      *
-     * Request body example:
+     * Request body example (minimal - only required fields):
      * [
      *   {
+     *     "exchange": "SSE",
+     *     "stockCode": "600000"
+     *   },
+     *   {
+     *     "exchange": "SZSE",
+     *     "stockCode": "000001"
+     *   },
+     *   {
+     *     "exchange": "BSE",
+     *     "stockCode": "430001"
+     *   }
+     * ]
+     *
+     * Request body example (with optional fields):
+     * [
+     *   {
+     *     "exchange": "SSE",
      *     "stockCode": "600000",
      *     "stockName": "浦发银行",
-     *     "companyName": "上海浦东发展银行股份有限公司",
      *     "listingDate": "1999-11-10",
-     *     "industry": "银行"
-     *   },
-     *   ...
+     *     "industry": "银行",
+     *     "area": "上海",
+     *     "fullName": "上海浦东发展银行股份有限公司",
+     *     "enName": "Shanghai Pudong Development Bank Co., Ltd.",
+     *     "cnSpell": "PFYH",
+     *     "market": "主板",
+     *     "currType": "CNY",
+     *     "isHs": "H",
+     *     "actName": "上海国际集团有限公司",
+     *     "actEntType": "国有企业"
+     *   }
      * ]
      *
      * @param requests List of batch create requests
@@ -191,10 +215,10 @@ public class StockController {
      *
      * Features:
      * - Filter by listing date range (listingDateFrom, listingDateTo)
-     * - Fuzzy search by keyword (matches stock code, stock name, or company name)
-     * - Multi-select filter by status (LISTED, DELISTED, SUSPENDED)
+     * - Fuzzy search by keyword (matches stock code or stock name)
+     * - Multi-select filter by status (L, D, P)
      * - Multi-select filter by industry
-     * - Multi-select filter by exchange (SH, SZ, BJ, HK, US)
+     * - Multi-select filter by exchange (SSE, SZSE, BSE, HKEX)
      * - Optional pagination (if page and size are provided)
      * - Returns full list if pagination parameters are not provided
      *
@@ -203,15 +227,15 @@ public class StockController {
      *   "listingDateFrom": "2020-01-01",
      *   "listingDateTo": "2023-12-31",
      *   "keyword": "银行",
-     *   "statuses": ["LISTED"],
+     *   "statuses": ["L"],
      *   "industries": ["银行", "保险"],
-     *   "exchanges": ["SH", "SZ"]
+     *   "exchanges": ["SSE", "SZSE"]
      * }
      *
      * Request body example (with pagination):
      * {
      *   "keyword": "银行",
-     *   "exchanges": ["SH"],
+     *   "exchanges": ["SSE"],
      *   "page": 0,
      *   "size": 20,
      *   "sortBy": "stockCode",
@@ -279,16 +303,7 @@ public class StockController {
         return Result.success(stocks);
     }
 
-    /**
-     * Search stocks by company name
-     * GET /api/stocks/search/company?keyword=xxx
-     */
-    @GetMapping("/search/company")
-    public Result<List<StockDTO>> searchStocksByCompany(@RequestParam("keyword") String keyword) {
-        log.info("REST request to search stocks by company: {}", keyword);
-        List<StockDTO> stocks = stockService.searchStocksByCompany(keyword);
-        return Result.success(stocks);
-    }
+
 
     /**
      * Delete stock
@@ -311,11 +326,10 @@ public class StockController {
 
         Map<String, Object> stats = new HashMap<>();
         stats.put("total", stockService.getStockCount());
-        stats.put("sh", stockService.getStockCountByExchange("SH"));
-        stats.put("sz", stockService.getStockCountByExchange("SZ"));
-        stats.put("bj", stockService.getStockCountByExchange("BJ"));
-        stats.put("hk", stockService.getStockCountByExchange("HK"));
-        stats.put("us", stockService.getStockCountByExchange("US"));
+        stats.put("sse", stockService.getStockCountByExchange("SSE"));
+        stats.put("szse", stockService.getStockCountByExchange("SZSE"));
+        stats.put("bse", stockService.getStockCountByExchange("BSE"));
+        stats.put("hkex", stockService.getStockCountByExchange("HKEX"));
 
         return Result.success(stats);
     }

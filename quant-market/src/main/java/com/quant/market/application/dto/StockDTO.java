@@ -23,17 +23,19 @@ public class  StockDTO {
     private String exchange;
     private String stockCode;
     private String stockName;
-    private String companyName;
     private LocalDate listingDate;
     private String industry;
     private String status;
-    private BigDecimal latestPrice;
-    private BigDecimal prevClosePrice;
-    private BigDecimal prevPrevClosePrice;
-    private BigDecimal totalShares;
-    private BigDecimal circulatingShares;
-    private BigDecimal totalMarketCap;
-    private BigDecimal circulatingMarketCap;
+    private String area;
+    private String fullName;
+    private String enName;
+    private String cnSpell;
+    private String market;
+    private String currType;
+    private LocalDate delistDate;
+    private String isHs;
+    private String actName;
+    private String actEntType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -46,17 +48,19 @@ public class  StockDTO {
                 .exchange(stock.getExchange().name())
                 .stockCode(stock.getStockCode())
                 .stockName(stock.getStockName())
-                .companyName(stock.getCompanyName())
                 .listingDate(stock.getListingDate())
                 .industry(stock.getIndustry())
                 .status(stock.getStatus().name())
-                .latestPrice(stock.getLatestPrice())
-                .prevClosePrice(stock.getPrevClosePrice())
-                .prevPrevClosePrice(stock.getPrevPrevClosePrice())
-                .totalShares(stock.getTotalShares())
-                .circulatingShares(stock.getCirculatingShares())
-                .totalMarketCap(stock.getTotalMarketCap())
-                .circulatingMarketCap(stock.getCirculatingMarketCap())
+                .area(stock.getArea())
+                .fullName(stock.getFullName())
+                .enName(stock.getEnName())
+                .cnSpell(stock.getCnSpell())
+                .market(stock.getMarket())
+                .currType(stock.getCurrType())
+                .delistDate(stock.getDelistDate())
+                .isHs(stock.getIsHs() != null ? stock.getIsHs().name() : null)
+                .actName(stock.getActName())
+                .actEntType(stock.getActEntType())
                 .createdAt(stock.getCreatedAt())
                 .updatedAt(stock.getUpdatedAt())
                 .build();
@@ -71,17 +75,19 @@ public class  StockDTO {
                 .exchange(Stock.Exchange.valueOf(exchange))
                 .stockCode(stockCode)
                 .stockName(stockName)
-                .companyName(companyName)
                 .listingDate(listingDate)
                 .industry(industry)
                 .status(Stock.StockStatus.valueOf(status))
-                .latestPrice(latestPrice)
-                .prevClosePrice(prevClosePrice)
-                .prevPrevClosePrice(prevPrevClosePrice)
-                .totalShares(totalShares)
-                .circulatingShares(circulatingShares)
-                .totalMarketCap(totalMarketCap)
-                .circulatingMarketCap(circulatingMarketCap)
+                .area(area)
+                .fullName(fullName)
+                .enName(enName)
+                .cnSpell(cnSpell)
+                .market(market)
+                .currType(currType)
+                .delistDate(delistDate)
+                .isHs(isHs != null ? Stock.IsHs.valueOf(isHs) : null)
+                .actName(actName)
+                .actEntType(actEntType)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();

@@ -12,15 +12,17 @@ import java.time.LocalDate;
 public class UpdateStockRequest {
 
     private String stockName;
-    private String companyName;
     private LocalDate listingDate;
     private String industry;
     private String status;
-    private BigDecimal latestPrice;
-    private BigDecimal prevClosePrice;
-    private BigDecimal prevPrevClosePrice;
-    private BigDecimal totalShares;
-    private BigDecimal circulatingShares;
-    private BigDecimal totalMarketCap;
-    private BigDecimal circulatingMarketCap;
+    private String area;
+    private String fullName;
+    private String enName;
+    private String cnSpell;
+    private String market;
+    private String currType;
+    private LocalDate delistDate;
+    private String isHs;
+    private String actName;
+    private String actEntType;
 }

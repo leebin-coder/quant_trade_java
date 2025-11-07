@@ -30,9 +30,6 @@ public class StockEntity {
     @Column(name = "stock_name", nullable = false, length = 100)
     private String stockName;
 
-    @Column(name = "company_name", nullable = false, length = 200)
-    private String companyName;
-
     @Column(name = "listing_date", nullable = false)
     private LocalDate listingDate;
 
@@ -43,26 +40,36 @@ public class StockEntity {
     @Column(nullable = false)
     private Stock.StockStatus status;
 
-    @Column(name = "latest_price", precision = 18, scale = 4)
-    private BigDecimal latestPrice;
+    @Column(length = 100)
+    private String area;
 
-    @Column(name = "prev_close_price", precision = 18, scale = 4)
-    private BigDecimal prevClosePrice;
+    @Column(name = "full_name", length = 200)
+    private String fullName;
 
-    @Column(name = "prev_prev_close_price", precision = 18, scale = 4)
-    private BigDecimal prevPrevClosePrice;
+    @Column(name = "en_name", length = 200)
+    private String enName;
 
-    @Column(name = "total_shares", precision = 20, scale = 2)
-    private BigDecimal totalShares;
+    @Column(name = "cn_spell", length = 50)
+    private String cnSpell;
 
-    @Column(name = "circulating_shares", precision = 20, scale = 2)
-    private BigDecimal circulatingShares;
+    @Column(length = 50)
+    private String market;
 
-    @Column(name = "total_market_cap", precision = 18, scale = 2)
-    private BigDecimal totalMarketCap;
+    @Column(name = "curr_type", length = 10)
+    private String currType;
 
-    @Column(name = "circulating_market_cap", precision = 18, scale = 2)
-    private BigDecimal circulatingMarketCap;
+    @Column(name = "delist_date")
+    private LocalDate delistDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "is_hs", length = 1)
+    private Stock.IsHs isHs;
+
+    @Column(name = "act_name", length = 200)
+    private String actName;
+
+    @Column(name = "act_ent_type", length = 50)
+    private String actEntType;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -90,17 +97,19 @@ public class StockEntity {
                 .exchange(exchange)
                 .stockCode(stockCode)
                 .stockName(stockName)
-                .companyName(companyName)
                 .listingDate(listingDate)
                 .industry(industry)
                 .status(status)
-                .latestPrice(latestPrice)
-                .prevClosePrice(prevClosePrice)
-                .prevPrevClosePrice(prevPrevClosePrice)
-                .totalShares(totalShares)
-                .circulatingShares(circulatingShares)
-                .totalMarketCap(totalMarketCap)
-                .circulatingMarketCap(circulatingMarketCap)
+                .area(area)
+                .fullName(fullName)
+                .enName(enName)
+                .cnSpell(cnSpell)
+                .market(market)
+                .currType(currType)
+                .delistDate(delistDate)
+                .isHs(isHs)
+                .actName(actName)
+                .actEntType(actEntType)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
@@ -115,17 +124,19 @@ public class StockEntity {
         entity.setExchange(stock.getExchange());
         entity.setStockCode(stock.getStockCode());
         entity.setStockName(stock.getStockName());
-        entity.setCompanyName(stock.getCompanyName());
         entity.setListingDate(stock.getListingDate());
         entity.setIndustry(stock.getIndustry());
         entity.setStatus(stock.getStatus());
-        entity.setLatestPrice(stock.getLatestPrice());
-        entity.setPrevClosePrice(stock.getPrevClosePrice());
-        entity.setPrevPrevClosePrice(stock.getPrevPrevClosePrice());
-        entity.setTotalShares(stock.getTotalShares());
-        entity.setCirculatingShares(stock.getCirculatingShares());
-        entity.setTotalMarketCap(stock.getTotalMarketCap());
-        entity.setCirculatingMarketCap(stock.getCirculatingMarketCap());
+        entity.setArea(stock.getArea());
+        entity.setFullName(stock.getFullName());
+        entity.setEnName(stock.getEnName());
+        entity.setCnSpell(stock.getCnSpell());
+        entity.setMarket(stock.getMarket());
+        entity.setCurrType(stock.getCurrType());
+        entity.setDelistDate(stock.getDelistDate());
+        entity.setIsHs(stock.getIsHs());
+        entity.setActName(stock.getActName());
+        entity.setActEntType(stock.getActEntType());
         entity.setCreatedAt(stock.getCreatedAt());
         entity.setUpdatedAt(stock.getUpdatedAt());
         return entity;

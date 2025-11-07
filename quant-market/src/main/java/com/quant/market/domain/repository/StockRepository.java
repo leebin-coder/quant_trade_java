@@ -58,11 +58,6 @@ public interface StockRepository {
     List<Stock> findByStockNameContaining(String stockName);
 
     /**
-     * Find by company name (fuzzy search)
-     */
-    List<Stock> findByCompanyNameContaining(String companyName);
-
-    /**
      * Find by industry
      */
     List<Stock> findByIndustry(String industry);
@@ -91,7 +86,7 @@ public interface StockRepository {
      * Query stocks by multiple conditions
      * @param listingDateFrom Listing date start (inclusive)
      * @param listingDateTo Listing date end (inclusive)
-     * @param keyword Fuzzy search keyword (match stock code, stock name, or company name)
+     * @param keyword Fuzzy search keyword (match stock code or stock name)
      * @param statuses Status list (multi-select)
      * @param industries Industry list (multi-select)
      * @param exchanges Exchange list (multi-select)

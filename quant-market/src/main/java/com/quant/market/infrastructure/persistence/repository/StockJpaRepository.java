@@ -23,8 +23,6 @@ public interface StockJpaRepository extends JpaRepository<StockEntity, Long>, Jp
 
     List<StockEntity> findByStockNameContaining(String stockName);
 
-    List<StockEntity> findByCompanyNameContaining(String companyName);
-
     List<StockEntity> findByIndustry(String industry);
 
     boolean existsByExchangeAndStockCode(Stock.Exchange exchange, String stockCode);

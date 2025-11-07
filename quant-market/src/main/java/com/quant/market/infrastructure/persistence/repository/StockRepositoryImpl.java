@@ -90,13 +90,6 @@ public class StockRepositoryImpl implements StockRepository {
     }
 
     @Override
-    public List<Stock> findByCompanyNameContaining(String companyName) {
-        return jpaRepository.findByCompanyNameContaining(companyName).stream()
-                .map(StockEntity::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<Stock> findByIndustry(String industry) {
         return jpaRepository.findByIndustry(industry).stream()
                 .map(StockEntity::toDomain)
@@ -143,13 +136,12 @@ public class StockRepositoryImpl implements StockRepository {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("listingDate"), listingDateTo));
             }
 
-            // Keyword fuzzy search (match stock code, stock name, or company name)
+            // Keyword fuzzy search (match stock code or stock name)
             if (keyword != null && !keyword.trim().isEmpty()) {
                 String likePattern = "%" + keyword.trim() + "%";
                 Predicate stockCodeLike = criteriaBuilder.like(root.get("stockCode"), likePattern);
                 Predicate stockNameLike = criteriaBuilder.like(root.get("stockName"), likePattern);
-                Predicate companyNameLike = criteriaBuilder.like(root.get("companyName"), likePattern);
-                predicates.add(criteriaBuilder.or(stockCodeLike, stockNameLike, companyNameLike));
+                predicates.add(criteriaBuilder.or(stockCodeLike, stockNameLike));
             }
 
             // Status multi-select filter

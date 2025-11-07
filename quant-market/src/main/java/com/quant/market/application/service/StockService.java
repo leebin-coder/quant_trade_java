@@ -68,9 +68,6 @@ public class StockService {
         if (request.getStockName() != null) {
             stock.setStockName(request.getStockName());
         }
-        if (request.getCompanyName() != null) {
-            stock.setCompanyName(request.getCompanyName());
-        }
         if (request.getListingDate() != null) {
             stock.setListingDate(request.getListingDate());
         }
@@ -80,26 +77,35 @@ public class StockService {
         if (request.getStatus() != null) {
             stock.setStatus(Stock.StockStatus.valueOf(request.getStatus()));
         }
-        if (request.getLatestPrice() != null) {
-            stock.setLatestPrice(request.getLatestPrice());
+        if (request.getArea() != null) {
+            stock.setArea(request.getArea());
         }
-        if (request.getPrevClosePrice() != null) {
-            stock.setPrevClosePrice(request.getPrevClosePrice());
+        if (request.getFullName() != null) {
+            stock.setFullName(request.getFullName());
         }
-        if (request.getPrevPrevClosePrice() != null) {
-            stock.setPrevPrevClosePrice(request.getPrevPrevClosePrice());
+        if (request.getEnName() != null) {
+            stock.setEnName(request.getEnName());
         }
-        if (request.getTotalShares() != null) {
-            stock.setTotalShares(request.getTotalShares());
+        if (request.getCnSpell() != null) {
+            stock.setCnSpell(request.getCnSpell());
         }
-        if (request.getCirculatingShares() != null) {
-            stock.setCirculatingShares(request.getCirculatingShares());
+        if (request.getMarket() != null) {
+            stock.setMarket(request.getMarket());
         }
-        if (request.getTotalMarketCap() != null) {
-            stock.setTotalMarketCap(request.getTotalMarketCap());
+        if (request.getCurrType() != null) {
+            stock.setCurrType(request.getCurrType());
         }
-        if (request.getCirculatingMarketCap() != null) {
-            stock.setCirculatingMarketCap(request.getCirculatingMarketCap());
+        if (request.getDelistDate() != null) {
+            stock.setDelistDate(request.getDelistDate());
+        }
+        if (request.getIsHs() != null) {
+            stock.setIsHs(Stock.IsHs.valueOf(request.getIsHs()));
+        }
+        if (request.getActName() != null) {
+            stock.setActName(request.getActName());
+        }
+        if (request.getActEntType() != null) {
+            stock.setActEntType(request.getActEntType());
         }
 
         Stock updated = stockRepository.save(stock);
@@ -197,18 +203,6 @@ public class StockService {
     }
 
     /**
-     * Search stocks by company name
-     */
-    @Transactional(readOnly = true)
-    public List<StockDTO> searchStocksByCompany(String keyword) {
-        log.info("Searching stocks by company: {}", keyword);
-
-        return stockRepository.findByCompanyNameContaining(keyword).stream()
-                .map(StockDTO::fromDomain)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Get stocks by industry
      */
     @Transactional(readOnly = true)
@@ -258,7 +252,6 @@ public class StockService {
      * Features:
      * - Asynchronous processing to avoid blocking
      * - Batch insert for better performance
-     * - Automatic exchange detection from stock code
      * - Skip duplicates instead of failing
      * - Returns summary of results
      *
@@ -288,8 +281,8 @@ public class StockService {
         for (int i = 0; i < requests.size(); i++) {
             BatchCreateStockRequest request = requests.get(i);
             try {
-                // Auto-detect exchange from stock code
-                Stock.Exchange exchange = Stock.Exchange.fromStockCode(request.getStockCode());
+                // Get exchange from request
+                Stock.Exchange exchange = Stock.Exchange.valueOf(request.getExchange().toUpperCase());
 
                 // Check if stock already exists (skip duplicates)
                 List<String> codesInExchange = existingStocks.getOrDefault(exchange.name(), new ArrayList<>());

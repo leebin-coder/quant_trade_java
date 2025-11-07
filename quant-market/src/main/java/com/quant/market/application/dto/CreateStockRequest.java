@@ -15,8 +15,9 @@ import java.time.LocalDate;
 public class CreateStockRequest {
 
     /**
-     * Exchange (Optional - will be auto-detected from stock code if not provided)
+     * Exchange (Required)
      */
+    @NotBlank(message = "Exchange cannot be blank")
     private String exchange;
 
     /**
@@ -32,12 +33,6 @@ public class CreateStockRequest {
     private String stockName;
 
     /**
-     * Company name (Required)
-     */
-    @NotBlank(message = "Company name cannot be blank")
-    private String companyName;
-
-    /**
      * Listing date (Required)
      */
     @NotNull(message = "Listing date cannot be null")
@@ -49,73 +44,81 @@ public class CreateStockRequest {
     private String industry;
 
     /**
-     * Stock status (Optional - defaults to LISTED)
+     * Stock status (Optional - defaults to L)
      */
     private String status;
 
     /**
-     * Latest price (Optional)
+     * Area (Optional)
      */
-    private BigDecimal latestPrice;
+    private String area;
 
     /**
-     * Previous close price (Optional)
+     * Full name (Optional)
      */
-    private BigDecimal prevClosePrice;
+    private String fullName;
 
     /**
-     * Close price from 2 trading days ago (Optional)
+     * English name (Optional)
      */
-    private BigDecimal prevPrevClosePrice;
+    private String enName;
 
     /**
-     * Total shares (Optional)
+     * Chinese pinyin abbreviation (Optional)
      */
-    private BigDecimal totalShares;
+    private String cnSpell;
 
     /**
-     * Circulating shares (Optional)
+     * Market type (Optional)
      */
-    private BigDecimal circulatingShares;
+    private String market;
 
     /**
-     * Total market cap (Optional)
+     * Trading currency (Optional)
      */
-    private BigDecimal totalMarketCap;
+    private String currType;
 
     /**
-     * Circulating market cap (Optional)
+     * Delisting date (Optional)
      */
-    private BigDecimal circulatingMarketCap;
+    private LocalDate delistDate;
+
+    /**
+     * HuShen-Gang Tong status (Optional)
+     */
+    private String isHs;
+
+    /**
+     * Actual controller name (Optional)
+     */
+    private String actName;
+
+    /**
+     * Actual controller entity type (Optional)
+     */
+    private String actEntType;
 
     /**
      * Convert to domain model
-     * If exchange is not provided, it will be auto-detected from stock code
      */
     public Stock toDomain() {
-        // Auto-detect exchange from stock code if not provided
-        Stock.Exchange stockExchange;
-        if (exchange == null || exchange.trim().isEmpty()) {
-            stockExchange = Stock.Exchange.fromStockCode(stockCode);
-        } else {
-            stockExchange = Stock.Exchange.valueOf(exchange.toUpperCase());
-        }
-
         return Stock.builder()
-                .exchange(stockExchange)
+                .exchange(Stock.Exchange.valueOf(exchange.toUpperCase()))
                 .stockCode(stockCode)
                 .stockName(stockName)
-                .companyName(companyName)
                 .listingDate(listingDate)
                 .industry(industry)
-                .status(status != null ? Stock.StockStatus.valueOf(status.toUpperCase()) : Stock.StockStatus.LISTED)
-                .latestPrice(latestPrice)
-                .prevClosePrice(prevClosePrice)
-                .prevPrevClosePrice(prevPrevClosePrice)
-                .totalShares(totalShares)
-                .circulatingShares(circulatingShares)
-                .totalMarketCap(totalMarketCap)
-                .circulatingMarketCap(circulatingMarketCap)
+                .status(status != null ? Stock.StockStatus.valueOf(status.toUpperCase()) : Stock.StockStatus.L)
+                .area(area)
+                .fullName(fullName)
+                .enName(enName)
+                .cnSpell(cnSpell)
+                .market(market)
+                .currType(currType)
+                .delistDate(delistDate)
+                .isHs(isHs != null ? Stock.IsHs.valueOf(isHs.toUpperCase()) : null)
+                .actName(actName)
+                .actEntType(actEntType)
                 .build();
     }
 }
