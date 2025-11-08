@@ -7,6 +7,8 @@ import com.quant.market.application.dto.DailyQueryRequest;
 import com.quant.market.application.dto.StockDailyDTO;
 import com.quant.market.domain.model.StockDaily;
 import com.quant.market.domain.repository.StockDailyRepository;
+import com.quant.market.infrastructure.persistence.entity.StockDailyEntity;
+import com.quant.market.infrastructure.persistence.repository.StockDailyBatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class StockDailyService {
 
     private final StockDailyRepository dailyRepository;
+    private final StockDailyBatchRepository batchRepository;
 
     /**
      * Query daily data with filters
@@ -52,9 +55,14 @@ public class StockDailyService {
     }
 
     /**
-     * Batch insert daily data
+     * Batch insert daily data - Optimized Version
      * Maximum 1000 items per batch
-     * Duplicates (same stock_code + trade_date) will be skipped
+     * Duplicates (same stock_code + trade_date) will be skipped automatically by database
+     *
+     * Uses PostgreSQL ON CONFLICT DO NOTHING for high-performance batch operations:
+     * - Single SQL statement for all records
+     * - Automatic duplicate detection by database
+     * - Much faster than checking existence individually
      *
      * @param requests List of daily data to insert
      * @return Batch insert result
@@ -75,30 +83,15 @@ public class StockDailyService {
         result.setTotal(requests.size());
 
         List<String> errors = new ArrayList<>();
-        List<String> skipped = new ArrayList<>();
-        List<StockDaily> toInsert = new ArrayList<>();
+        List<StockDailyEntity> validEntities = new ArrayList<>();
 
+        // Validate and convert to entities
         for (int i = 0; i < requests.size(); i++) {
             BatchCreateDailyRequest request = requests.get(i);
             try {
-                // Check if record already exists
-                boolean exists = dailyRepository.existsByStockCodeAndTradeDate(
-                        request.getStockCode(),
-                        request.getTradeDate()
-                );
-
-                if (exists) {
-                    String skipMsg = String.format("Row %d: Data already exists: %s on %s",
-                            i + 1, request.getStockCode(), request.getTradeDate());
-                    skipped.add(skipMsg);
-                    log.debug(skipMsg);
-                    continue;
-                }
-
-                // Convert to domain model and add to insert list
-                StockDaily daily = request.toDomain();
-                toInsert.add(daily);
-
+                StockDaily domain = request.toDomain();
+                StockDailyEntity entity = StockDailyEntity.fromDomain(domain);
+                validEntities.add(entity);
             } catch (Exception e) {
                 String errorMsg = String.format("Row %d: %s on %s - %s",
                         i + 1, request.getStockCode(), request.getTradeDate(), e.getMessage());
@@ -107,12 +100,11 @@ public class StockDailyService {
             }
         }
 
-        // Batch insert all records at once
+        // Perform batch insert using native SQL
         int insertedCount = 0;
-        if (!toInsert.isEmpty()) {
+        if (!validEntities.isEmpty()) {
             try {
-                List<StockDaily> saved = dailyRepository.saveAll(toInsert);
-                insertedCount = saved.size();
+                insertedCount = batchRepository.batchInsert(validEntities);
                 log.info("Batch inserted {} daily records", insertedCount);
             } catch (Exception e) {
                 log.error("Error during batch insert", e);
@@ -120,11 +112,12 @@ public class StockDailyService {
             }
         }
 
+        int skippedCount = validEntities.size() - insertedCount;
         result.setInserted(insertedCount);
-        result.setSkipped(skipped.size());
+        result.setSkipped(skippedCount);
         result.setFailed(errors.size());
         result.setErrors(errors);
-        result.setSkippedItems(skipped);
+        result.setSkippedItems(new ArrayList<>()); // Not tracked individually in batch mode
 
         long duration = System.currentTimeMillis() - startTime;
         result.setProcessingTimeMs(duration);

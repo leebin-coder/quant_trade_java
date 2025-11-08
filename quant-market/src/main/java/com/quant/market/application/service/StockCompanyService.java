@@ -6,6 +6,8 @@ import com.quant.market.application.dto.BatchUpsertCompanyRequest;
 import com.quant.market.application.dto.StockCompanyDTO;
 import com.quant.market.domain.model.StockCompany;
 import com.quant.market.domain.repository.StockCompanyRepository;
+import com.quant.market.infrastructure.persistence.entity.StockCompanyEntity;
+import com.quant.market.infrastructure.persistence.repository.StockCompanyBatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Stock Company Application Service
@@ -23,6 +26,7 @@ import java.util.List;
 public class StockCompanyService {
 
     private final StockCompanyRepository companyRepository;
+    private final StockCompanyBatchRepository batchRepository;
 
     /**
      * Get company by stock code
@@ -39,8 +43,13 @@ public class StockCompanyService {
     }
 
     /**
-     * Batch upsert companies (Insert or Update)
+     * Batch upsert companies (Insert or Update) - Optimized Version
      * Maximum 1000 items per batch
+     *
+     * Uses PostgreSQL ON CONFLICT for high-performance batch operations:
+     * - Single SQL statement for all records
+     * - Automatic insert/update decision by database
+     * - Much faster than individual queries
      *
      * Uniqueness is determined by 5 fields:
      * - stock_code (股票代码)
@@ -65,57 +74,15 @@ public class StockCompanyService {
         result.setTotal(requests.size());
 
         List<String> errors = new ArrayList<>();
-        int insertCount = 0;
-        int updateCount = 0;
+        List<StockCompanyEntity> validEntities = new ArrayList<>();
 
+        // Validate and convert to entities
         for (int i = 0; i < requests.size(); i++) {
             BatchUpsertCompanyRequest request = requests.get(i);
             try {
-                // Check if company exists by unique fields
-                boolean exists = companyRepository.existsByUniqueFields(
-                        request.getStockCode(),
-                        request.getComName(),
-                        request.getComId(),
-                        request.getChairman(),
-                        request.getExchange()
-                );
-
-                if (exists) {
-                    // Update existing company
-                    StockCompany existing = companyRepository.findByUniqueFields(
-                            request.getStockCode(),
-                            request.getComName(),
-                            request.getComId(),
-                            request.getChairman(),
-                            request.getExchange()
-                    ).orElseThrow();
-
-                    // Update fields
-                    existing.setManager(request.getManager());
-                    existing.setSecretary(request.getSecretary());
-                    existing.setRegCapital(request.getRegCapital());
-                    existing.setSetupDate(request.getSetupDate());
-                    existing.setProvince(request.getProvince());
-                    existing.setCity(request.getCity());
-                    existing.setIntroduction(request.getIntroduction());
-                    existing.setWebsite(request.getWebsite());
-                    existing.setEmail(request.getEmail());
-                    existing.setOffice(request.getOffice());
-                    existing.setEmployees(request.getEmployees());
-                    existing.setMainBusiness(request.getMainBusiness());
-                    existing.setBusinessScope(request.getBusinessScope());
-
-                    companyRepository.save(existing);
-                    updateCount++;
-                    log.debug("Updated company: {}.{}", request.getExchange(), request.getStockCode());
-                } else {
-                    // Insert new company
-                    StockCompany newCompany = request.toDomain();
-                    companyRepository.save(newCompany);
-                    insertCount++;
-                    log.debug("Inserted new company: {}.{}", request.getExchange(), request.getStockCode());
-                }
-
+                StockCompany domain = request.toDomain();
+                StockCompanyEntity entity = StockCompanyEntity.fromDomain(domain);
+                validEntities.add(entity);
             } catch (Exception e) {
                 String errorMsg = String.format("Row %d: %s.%s - %s",
                         i + 1, request.getExchange(), request.getStockCode(), e.getMessage());
@@ -124,16 +91,30 @@ public class StockCompanyService {
             }
         }
 
-        result.setInserted(insertCount);
-        result.setUpdated(updateCount);
+        // Perform batch upsert using native SQL
+        int affectedRows = 0;
+        if (!validEntities.isEmpty()) {
+            try {
+                affectedRows = batchRepository.batchUpsert(validEntities);
+                log.info("Batch upsert affected {} rows", affectedRows);
+            } catch (Exception e) {
+                log.error("Error during batch upsert", e);
+                errors.add("Batch upsert error: " + e.getMessage());
+            }
+        }
+
+        // Note: We can't distinguish between inserts and updates with ON CONFLICT
+        // So we report all successful operations as "upserted"
+        result.setInserted(affectedRows); // Actually means "upserted"
+        result.setUpdated(0); // Not tracked separately in batch mode
         result.setFailed(errors.size());
         result.setErrors(errors);
 
         long duration = System.currentTimeMillis() - startTime;
         result.setProcessingTimeMs(duration);
 
-        log.info("Batch upsert completed: total={}, inserted={}, updated={}, failed={}, time={}ms",
-                result.getTotal(), result.getInserted(), result.getUpdated(), result.getFailed(), duration);
+        log.info("Batch upsert completed: total={}, upserted={}, failed={}, time={}ms",
+                result.getTotal(), affectedRows, result.getFailed(), duration);
 
         return result;
     }
