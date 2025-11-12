@@ -108,4 +108,9 @@ public class StockDailyRepositoryImpl implements StockDailyRepository {
     public long countByStockCode(String stockCode) {
         return jpaRepository.findByStockCodeOrderByTradeDateDesc(stockCode).size();
     }
+
+    @Override
+    public LocalDate findLatestTradeDate() {
+        return jpaRepository.findLatestTradeDate();
+    }
 }

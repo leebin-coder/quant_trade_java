@@ -145,6 +145,16 @@ public class StockDailyService {
     }
 
     /**
+     * Get the latest trade date in the database
+     *
+     * @return Latest trade date, or null if no data exists
+     */
+    @Transactional(readOnly = true)
+    public java.time.LocalDate getLatestTradeDate() {
+        return dailyRepository.findLatestTradeDate();
+    }
+
+    /**
      * Batch Insert Result DTO
      */
     @lombok.Data

@@ -126,10 +126,6 @@ public class StockDailyController {
             return Result.error(400, "Request list cannot be empty");
         }
 
-        if (requests.size() > 1000) {
-            return Result.error(400, "Batch size cannot exceed 1000 items. Received: " + requests.size());
-        }
-
         // Process batch insert
         StockDailyService.BatchInsertResult result = dailyService.batchInsertDailyData(requests);
 
@@ -188,5 +184,32 @@ public class StockDailyController {
         stats.put("recordCount", dailyService.getDailyDataCountByStockCode(stockCode));
 
         return Result.success(stats);
+    }
+
+    /**
+     * Get the latest trade date
+     * GET /api/stock-daily/latest-date
+     *
+     * Returns the most recent trade date in the database as a string.
+     * - If no data exists in the table, returns null
+     * - If data exists, returns the latest trade date in "yyyy-MM-dd" format
+     *
+     * Response example when data exists:
+     * "2024-12-31"
+     *
+     * Response example when no data exists:
+     * null
+     *
+     * @return Latest trade date string or null if no data exists
+     */
+    @GetMapping("/latest-date")
+    public Result<String> getLatestTradeDate() {
+        log.info("REST request to get latest trade date");
+
+        java.time.LocalDate latestDate = dailyService.getLatestTradeDate();
+        String dateString = latestDate != null ? latestDate.toString() : null;
+
+        log.info("Latest trade date: {}", dateString);
+        return Result.success(dateString);
     }
 }

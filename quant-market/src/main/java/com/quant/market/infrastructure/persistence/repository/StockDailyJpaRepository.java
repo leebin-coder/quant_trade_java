@@ -93,4 +93,10 @@ public interface StockDailyJpaRepository extends JpaRepository<StockDailyEntity,
     List<StockDailyEntity> findByStockCodeAndEndDateAsc(
             @Param("stockCode") String stockCode,
             @Param("endDate") LocalDate endDate);
+
+    /**
+     * Find the latest trade date in the database
+     */
+    @Query("SELECT MAX(d.tradeDate) FROM StockDailyEntity d")
+    LocalDate findLatestTradeDate();
 }

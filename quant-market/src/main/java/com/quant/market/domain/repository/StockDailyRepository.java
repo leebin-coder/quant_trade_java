@@ -65,4 +65,11 @@ public interface StockDailyRepository {
      * Count by stock code
      */
     long countByStockCode(String stockCode);
+
+    /**
+     * Find the latest trade date in the database
+     *
+     * @return Latest trade date, or null if no data exists
+     */
+    LocalDate findLatestTradeDate();
 }
