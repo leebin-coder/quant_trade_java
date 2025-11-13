@@ -71,12 +71,6 @@ public class StockDailyService {
     public BatchInsertResult batchInsertDailyData(List<BatchCreateDailyRequest> requests) {
         log.info("Starting batch insert daily data: {} items", requests.size());
 
-        // Validate batch size
-        if (requests.size() > 1000) {
-            throw new BusinessException(
-                    ResultCode.VALIDATION_ERROR.getCode(),
-                    "Batch size cannot exceed 1000 items. Received: " + requests.size());
-        }
 
         long startTime = System.currentTimeMillis();
         BatchInsertResult result = new BatchInsertResult();
