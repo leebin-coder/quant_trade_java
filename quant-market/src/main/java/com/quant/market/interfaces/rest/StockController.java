@@ -2,6 +2,7 @@ package com.quant.market.interfaces.rest;
 
 import com.quant.common.response.PageResult;
 import com.quant.common.response.Result;
+import com.quant.common.security.JwtTokenUtil;
 import com.quant.market.application.dto.BatchCreateStockRequest;
 import com.quant.market.application.dto.CreateStockRequest;
 import com.quant.market.application.dto.StockDTO;
@@ -32,6 +33,22 @@ import java.util.concurrent.CompletableFuture;
 public class StockController {
 
     private final StockService stockService;
+    private final JwtTokenUtil jwtTokenUtil;
+
+    /**
+     * 从请求头中获取用户ID（可选，如果没有token则返回null）
+     */
+    private Long getUserIdFromToken(String authHeader) {
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                return jwtTokenUtil.getUserIdFromToken(token);
+            }
+        } catch (Exception e) {
+            log.debug("Failed to extract userId from token: {}", e.getMessage());
+        }
+        return null;
+    }
 
     /**
      * Create new stock
@@ -213,6 +230,9 @@ public class StockController {
      * Query stocks by multiple conditions (with optional pagination)
      * POST /api/stocks/query
      *
+     * Headers (Optional):
+     * Authorization: Bearer <JWT_TOKEN>  (如果提供token，返回结果中会包含isFollowed字段)
+     *
      * Features:
      * - Filter by listing date range (listingDateFrom, listingDateTo)
      * - Fuzzy search by keyword (matches stock code or stock name)
@@ -221,6 +241,7 @@ public class StockController {
      * - Multi-select filter by exchange (SSE, SZSE, BSE, HKEX)
      * - Optional pagination (if page and size are provided)
      * - Returns full list if pagination parameters are not provided
+     * - Returns isFollowed field for each stock (if user is logged in)
      *
      * Request body example (without pagination - returns all):
      * {
@@ -243,12 +264,19 @@ public class StockController {
      * }
      *
      * @param request Query conditions (with optional pagination)
+     * @param authHeader Authorization header (optional)
      * @return List of matching stocks or PageResult if pagination is requested
      */
     @PostMapping("/query")
-    public Result<?> queryStocks(@RequestBody StockQueryRequest request) {
+    public Result<?> queryStocks(
+            @RequestBody StockQueryRequest request,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
         log.info("REST request to query stocks with conditions: {}", request);
-        Object result = stockService.queryStocks(request);
+
+        // 获取用户ID（如果已登录）
+        Long userId = getUserIdFromToken(authHeader);
+
+        Object result = stockService.queryStocks(request, userId);
 
         if (result instanceof com.quant.common.response.PageResult) {
             // Return PageResult directly (it already extends Result)

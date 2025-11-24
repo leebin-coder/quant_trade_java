@@ -8,6 +8,8 @@ import com.quant.market.application.dto.StockDTO;
 import com.quant.market.application.dto.StockQueryRequest;
 import com.quant.market.application.dto.UpdateStockRequest;
 import com.quant.market.domain.model.Stock;
+import com.quant.market.domain.model.StockRelation;
+import com.quant.market.domain.repository.StockRelationRepository;
 import com.quant.market.domain.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 public class StockService {
 
     private final StockRepository stockRepository;
+    private final StockRelationRepository stockRelationRepository;
 
     /**
      * Create new stock
@@ -337,10 +338,12 @@ public class StockService {
 
     /**
      * Query stocks by multiple conditions (with optional pagination)
+     * @param request 查询请求
+     * @param userId 用户ID（可选，用于设置isFollowed字段）
      */
     @Transactional(readOnly = true)
-    public Object queryStocks(StockQueryRequest request) {
-        log.info("Querying stocks with conditions: {}", request);
+    public Object queryStocks(StockQueryRequest request, Long userId) {
+        log.info("Querying stocks with conditions: {}, userId: {}", request, userId);
 
         // Convert string lists to enums
         List<Stock.StockStatus> statuses = null;
@@ -414,6 +417,9 @@ public class StockService {
                         .collect(Collectors.toList());
             }
 
+            // 批量设置 isFollowed 字段
+            setIsFollowedBatch(pagedStocks, userId);
+
             // Create PageResult
             com.quant.common.response.PageResult<StockDTO> pageResult =
                     com.quant.common.response.PageResult.success(
@@ -431,9 +437,44 @@ public class StockService {
                     .map(StockDTO::fromDomain)
                     .collect(Collectors.toList());
 
+            // 批量设置 isFollowed 字段
+            setIsFollowedBatch(stockDTOs, userId);
+
             log.info("Returning all {} results without pagination", stockDTOs.size());
             return stockDTOs;
         }
+    }
+
+    /**
+     * 批量设置股票的 isFollowed 字段
+     * @param stockDTOs 股票DTO列表
+     * @param userId 用户ID，如果为null则所有股票的isFollowed都设置为false
+     */
+    private void setIsFollowedBatch(List<StockDTO> stockDTOs, Long userId) {
+        if (stockDTOs == null || stockDTOs.isEmpty()) {
+            return;
+        }
+
+        if (userId == null) {
+            // 未登录用户，全部设置为 false
+            stockDTOs.forEach(dto -> dto.setIsFollowed(false));
+            return;
+        }
+
+        // 提取所有股票代码
+        List<String> stockCodes = stockDTOs.stream()
+                .map(StockDTO::getStockCode)
+                .collect(Collectors.toList());
+
+        // 批量查询用户关注的股票代码
+        List<String> followedStockCodes = stockRelationRepository.findFollowedStockCodes(
+                stockCodes, userId, StockRelation.RefType.STOCKS_USER_FOLLOWED);
+
+        // 转换为Set以便快速查找
+        Set<String> followedSet = new HashSet<>(followedStockCodes);
+
+        // 批量设置 isFollowed 字段
+        stockDTOs.forEach(dto -> dto.setIsFollowed(followedSet.contains(dto.getStockCode())));
     }
 
     /**

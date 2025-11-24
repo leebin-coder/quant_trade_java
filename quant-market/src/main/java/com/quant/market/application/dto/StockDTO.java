@@ -40,6 +40,11 @@ public class  StockDTO {
     private LocalDateTime updatedAt;
 
     /**
+     * 是否关注（当前用户是否关注了该股票）
+     */
+    private Boolean isFollowed;
+
+    /**
      * Convert from domain model
      */
     public static StockDTO fromDomain(Stock stock) {

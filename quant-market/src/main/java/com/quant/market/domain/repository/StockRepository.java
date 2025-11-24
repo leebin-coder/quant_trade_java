@@ -83,6 +83,11 @@ public interface StockRepository {
     long countByExchange(Stock.Exchange exchange);
 
     /**
+     * Find stocks by stock code list
+     */
+    List<Stock> findByStockCodeIn(List<String> stockCodes);
+
+    /**
      * Query stocks by multiple conditions
      * @param listingDateFrom Listing date start (inclusive)
      * @param listingDateTo Listing date end (inclusive)

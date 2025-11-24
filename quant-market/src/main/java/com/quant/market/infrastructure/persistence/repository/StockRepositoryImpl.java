@@ -117,6 +117,13 @@ public class StockRepositoryImpl implements StockRepository {
     }
 
     @Override
+    public List<Stock> findByStockCodeIn(List<String> stockCodes) {
+        return jpaRepository.findByStockCodeIn(stockCodes).stream()
+                .map(StockEntity::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Stock> queryStocks(
             LocalDate listingDateFrom,
             LocalDate listingDateTo,

@@ -85,6 +85,14 @@ spring:
           filters:
             - StripPrefix=0
 
+        # Market service routes - stock relations (user follow stocks)
+        - id: market-service-stock-relations
+          uri: lb://quant-market
+          predicates:
+            - Path=/api/stock-relations/**
+          filters:
+            - StripPrefix=0
+
         # Strategy service routes
         - id: strategy-service
           uri: lb://quant-strategy

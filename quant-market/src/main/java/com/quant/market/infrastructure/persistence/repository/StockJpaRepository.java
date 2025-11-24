@@ -28,4 +28,6 @@ public interface StockJpaRepository extends JpaRepository<StockEntity, Long>, Jp
     boolean existsByExchangeAndStockCode(Stock.Exchange exchange, String stockCode);
 
     long countByExchange(Stock.Exchange exchange);
+
+    List<StockEntity> findByStockCodeIn(List<String> stockCodes);
 }

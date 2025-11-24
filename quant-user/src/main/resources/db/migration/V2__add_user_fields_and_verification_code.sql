@@ -2,22 +2,22 @@
 -- V2: Add nick_name, sex fields and create verification_codes table
 
 -- Modify users table - add new fields
-ALTER TABLE users ADD COLUMN IF NOT EXISTS nick_name VARCHAR(128);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS sex VARCHAR(16);
+ALTER TABLE t_user ADD COLUMN IF NOT EXISTS nick_name VARCHAR(128);
+ALTER TABLE t_user ADD COLUMN IF NOT EXISTS sex VARCHAR(16);
 
 -- Make password nullable for phone-based registration
-ALTER TABLE users ALTER COLUMN password DROP NOT NULL;
+ALTER TABLE t_user ALTER COLUMN password DROP NOT NULL;
 
 -- Make username nullable and non-unique for phone-only registration
-ALTER TABLE users ALTER COLUMN username DROP NOT NULL;
-ALTER TABLE users DROP CONSTRAINT IF EXISTS users_username_key;
+ALTER TABLE t_user ALTER COLUMN username DROP NOT NULL;
+ALTER TABLE t_user DROP CONSTRAINT IF EXISTS users_username_key;
 
 -- Ensure mobile is not null (primary identifier)
-ALTER TABLE users ALTER COLUMN mobile SET NOT NULL;
+ALTER TABLE t_user ALTER COLUMN mobile SET NOT NULL;
 
 -- Update comments
-COMMENT ON COLUMN users.nick_name IS 'User nickname';
-COMMENT ON COLUMN users.sex IS 'User gender: MALE, FEMALE, UNKNOWN';
+COMMENT ON COLUMN t_user.nick_name IS 'User nickname';
+COMMENT ON COLUMN t_user.sex IS 'User gender: MALE, FEMALE, UNKNOWN';
 
 -- Create verification codes table
 CREATE TABLE IF NOT EXISTS verification_codes (
