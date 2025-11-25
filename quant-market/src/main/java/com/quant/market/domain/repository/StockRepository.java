@@ -105,4 +105,12 @@ public interface StockRepository {
             List<String> industries,
             List<Stock.Exchange> exchanges
     );
+
+    /**
+     * Batch upsert stocks (insert or update based on exchange and stock_code)
+     * Uses PostgreSQL ON CONFLICT clause for high performance batch operations
+     * @param stocks List of stocks to upsert
+     * @return Number of affected rows
+     */
+    int batchUpsert(List<Stock> stocks);
 }

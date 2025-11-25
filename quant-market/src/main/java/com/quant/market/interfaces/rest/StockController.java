@@ -62,12 +62,15 @@ public class StockController {
     }
 
     /**
-     * Batch create stocks (Async, High Performance)
+     * Batch create or update stocks (Async, High Performance)
      * POST /api/stocks/batch
      *
      * Features:
      * - Asynchronous processing (non-blocking)
-     * - Skips duplicates automatically
+     * - Batch UPSERT operation: inserts new stocks or updates existing ones
+     * - Uses (exchange, stock_code) as the unique key
+     * - If stock exists (same exchange + stock_code), all fields will be updated
+     * - If stock doesn't exist, a new record will be inserted
      * - Returns immediately with task accepted message
      * - Batch result will be logged server-side
      * - Only exchange and stockCode are required, all other fields are optional
@@ -108,13 +111,13 @@ public class StockController {
      *   }
      * ]
      *
-     * @param requests List of batch create requests
+     * @param requests List of batch create/update requests
      * @return Immediate response with task acceptance
      */
     @PostMapping("/batch")
     public Result<Map<String, Object>> batchCreateStocks(
             @RequestBody @Valid List<BatchCreateStockRequest> requests) {
-        log.info("REST request to batch create stocks: {} items", requests.size());
+        log.info("REST request to batch upsert stocks: {} items", requests.size());
 
         if (requests.isEmpty()) {
             return Result.error(400, "Request list cannot be empty");
@@ -131,24 +134,21 @@ public class StockController {
         // Register callback for logging results
         future.whenComplete((result, ex) -> {
             if (ex != null) {
-                log.error("Batch create stocks failed", ex);
+                log.error("Batch upsert stocks failed", ex);
             } else {
-                log.info("Batch create stocks completed: {}", result.getSummary());
+                log.info("Batch upsert stocks completed: {}", result.getSummary());
                 if (!result.getErrors().isEmpty()) {
-                    log.warn("Batch create errors: {}", result.getErrors());
-                }
-                if (!result.getSkippedItems().isEmpty()) {
-                    log.info("Batch create skipped items: {}", result.getSkippedItems());
+                    log.warn("Batch upsert errors: {}", result.getErrors());
                 }
             }
         });
 
         // Return immediate response
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "Batch create task accepted");
+        response.put("message", "Batch upsert task accepted");
         response.put("totalItems", requests.size());
         response.put("status", "Processing");
-        response.put("note", "Task is running asynchronously. Check server logs for completion status.");
+        response.put("note", "Task is running asynchronously. Insert or update based on (exchange, stock_code). Check server logs for completion status.");
 
         return Result.success(response);
     }

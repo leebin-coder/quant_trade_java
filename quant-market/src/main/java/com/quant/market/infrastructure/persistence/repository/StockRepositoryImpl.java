@@ -5,11 +5,16 @@ import com.quant.market.domain.repository.StockRepository;
 import com.quant.market.infrastructure.persistence.entity.StockEntity;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +24,13 @@ import java.util.stream.Collectors;
 /**
  * Stock Repository Implementation
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StockRepositoryImpl implements StockRepository {
 
     private final StockJpaRepository jpaRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Stock save(Stock stock) {
@@ -172,5 +179,74 @@ public class StockRepositoryImpl implements StockRepository {
         return jpaRepository.findAll(spec).stream()
                 .map(StockEntity::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public int batchUpsert(List<Stock> stocks) {
+        if (stocks == null || stocks.isEmpty()) {
+            return 0;
+        }
+
+        String sql = "INSERT INTO t_stock_basic " +
+                "(exchange, stock_code, stock_name, listing_date, industry, status, area, " +
+                "full_name, en_name, cn_spell, market, curr_type, delist_date, is_hs, " +
+                "act_name, act_ent_type, created_at, updated_at) " +
+                "VALUES (?, ?, ?, ?, ?, ?::VARCHAR, ?, ?, ?, ?, ?, ?, ?, ?::VARCHAR, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) " +
+                "ON CONFLICT (exchange, stock_code) " +
+                "DO UPDATE SET " +
+                "stock_name = EXCLUDED.stock_name, " +
+                "listing_date = EXCLUDED.listing_date, " +
+                "industry = EXCLUDED.industry, " +
+                "status = EXCLUDED.status, " +
+                "area = EXCLUDED.area, " +
+                "full_name = EXCLUDED.full_name, " +
+                "en_name = EXCLUDED.en_name, " +
+                "cn_spell = EXCLUDED.cn_spell, " +
+                "market = EXCLUDED.market, " +
+                "curr_type = EXCLUDED.curr_type, " +
+                "delist_date = EXCLUDED.delist_date, " +
+                "is_hs = EXCLUDED.is_hs, " +
+                "act_name = EXCLUDED.act_name, " +
+                "act_ent_type = EXCLUDED.act_ent_type, " +
+                "updated_at = CURRENT_TIMESTAMP";
+
+        int[] updateCounts = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Stock stock = stocks.get(i);
+                int paramIndex = 1;
+
+                // INSERT values
+                ps.setString(paramIndex++, stock.getExchange().name());
+                ps.setString(paramIndex++, stock.getStockCode());
+                ps.setString(paramIndex++, stock.getStockName());
+                ps.setObject(paramIndex++, stock.getListingDate());
+                ps.setString(paramIndex++, stock.getIndustry());
+                ps.setString(paramIndex++, stock.getStatus() != null ? stock.getStatus().name() : null);
+                ps.setString(paramIndex++, stock.getArea());
+                ps.setString(paramIndex++, stock.getFullName());
+                ps.setString(paramIndex++, stock.getEnName());
+                ps.setString(paramIndex++, stock.getCnSpell());
+                ps.setString(paramIndex++, stock.getMarket());
+                ps.setString(paramIndex++, stock.getCurrType());
+                ps.setObject(paramIndex++, stock.getDelistDate());
+                ps.setString(paramIndex++, stock.getIsHs() != null ? stock.getIsHs().name() : null);
+                ps.setString(paramIndex++, stock.getActName());
+                ps.setString(paramIndex++, stock.getActEntType());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return stocks.size();
+            }
+        });
+
+        int totalAffected = 0;
+        for (int count : updateCounts) {
+            totalAffected += count;
+        }
+
+        log.info("Batch upsert completed: {} stocks processed, {} rows affected", stocks.size(), totalAffected);
+        return totalAffected;
     }
 }

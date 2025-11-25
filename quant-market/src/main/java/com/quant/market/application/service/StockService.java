@@ -248,59 +248,36 @@ public class StockService {
     }
 
     /**
-     * Batch create stocks (Async, High Performance)
+     * Batch create or update stocks (Async, High Performance)
      *
      * Features:
      * - Asynchronous processing to avoid blocking
-     * - Batch insert for better performance
-     * - Skip duplicates instead of failing
+     * - Batch upsert (insert or update) based on stock_code
+     * - If stock_code exists, updates all fields
+     * - If stock_code doesn't exist, inserts new record
      * - Returns summary of results
      *
-     * @param requests List of batch create requests
+     * @param requests List of batch create/update requests
      * @return CompletableFuture with batch result summary
      */
     @Async("stockBatchExecutor")
     @Transactional
     public CompletableFuture<BatchCreateResult> batchCreateStocks(List<BatchCreateStockRequest> requests) {
-        log.info("Starting batch create stocks: {} items", requests.size());
+        log.info("Starting batch upsert stocks: {} items", requests.size());
         long startTime = System.currentTimeMillis();
 
         BatchCreateResult result = new BatchCreateResult();
         result.setTotal(requests.size());
 
-        List<Stock> stocksToSave = new ArrayList<>();
+        List<Stock> stocksToUpsert = new ArrayList<>();
         List<String> errors = new ArrayList<>();
-        List<String> skipped = new ArrayList<>();
-
-        // Get all existing stock codes grouped by exchange for fast lookup
-        Map<String, List<String>> existingStocks = stockRepository.findAll().stream()
-                .collect(Collectors.groupingBy(
-                        stock -> stock.getExchange().name(),
-                        Collectors.mapping(Stock::getStockCode, Collectors.toList())
-                ));
 
         for (int i = 0; i < requests.size(); i++) {
             BatchCreateStockRequest request = requests.get(i);
             try {
-                // Get exchange from request
-                Stock.Exchange exchange = Stock.Exchange.valueOf(request.getExchange().toUpperCase());
-
-                // Check if stock already exists (skip duplicates)
-                List<String> codesInExchange = existingStocks.getOrDefault(exchange.name(), new ArrayList<>());
-                if (codesInExchange.contains(request.getStockCode())) {
-                    String skipMsg = String.format("Row %d: Stock already exists: %s.%s",
-                            i + 1, exchange.name(), request.getStockCode());
-                    skipped.add(skipMsg);
-                    log.debug(skipMsg);
-                    continue;
-                }
-
                 // Convert to domain model
                 Stock stock = request.toDomain();
-                stocksToSave.add(stock);
-
-                // Add to existing stocks map to detect duplicates within the batch
-                codesInExchange.add(request.getStockCode());
+                stocksToUpsert.add(stock);
 
             } catch (Exception e) {
                 String errorMsg = String.format("Row %d: %s - %s",
@@ -310,28 +287,28 @@ public class StockService {
             }
         }
 
-        // Batch save all stocks at once
-        if (!stocksToSave.isEmpty()) {
+        // Batch upsert all stocks at once (insert or update)
+        int affectedRows = 0;
+        if (!stocksToUpsert.isEmpty()) {
             try {
-                List<Stock> savedStocks = stockRepository.saveAll(stocksToSave);
-                result.setSuccess(savedStocks.size());
-                log.info("Batch saved {} stocks", savedStocks.size());
+                affectedRows = stockRepository.batchUpsert(stocksToUpsert);
+                result.setSuccess(affectedRows);
+                log.info("Batch upsert affected {} rows", affectedRows);
             } catch (Exception e) {
-                log.error("Error during batch save", e);
-                errors.add("Batch save error: " + e.getMessage());
+                log.error("Error during batch upsert", e);
+                errors.add("Batch upsert error: " + e.getMessage());
+                result.setFailed(stocksToUpsert.size());
             }
         }
 
         result.setFailed(errors.size());
-        result.setSkipped(skipped.size());
         result.setErrors(errors);
-        result.setSkippedItems(skipped);
 
         long duration = System.currentTimeMillis() - startTime;
         result.setProcessingTimeMs(duration);
 
-        log.info("Batch create completed: total={}, success={}, failed={}, skipped={}, time={}ms",
-                result.getTotal(), result.getSuccess(), result.getFailed(), result.getSkipped(), duration);
+        log.info("Batch upsert completed: total={}, success={}, failed={}, time={}ms",
+                result.getTotal(), result.getSuccess(), result.getFailed(), duration);
 
         return CompletableFuture.completedFuture(result);
     }
@@ -478,21 +455,19 @@ public class StockService {
     }
 
     /**
-     * Batch Create Result DTO
+     * Batch Create/Update Result DTO
      */
     @lombok.Data
     public static class BatchCreateResult {
         private int total;
         private int success;
         private int failed;
-        private int skipped;
         private List<String> errors = new ArrayList<>();
-        private List<String> skippedItems = new ArrayList<>();
         private long processingTimeMs;
 
         public String getSummary() {
-            return String.format("Total: %d, Success: %d, Failed: %d, Skipped: %d, Time: %dms",
-                    total, success, failed, skipped, processingTimeMs);
+            return String.format("Total: %d, Success: %d, Failed: %d, Time: %dms",
+                    total, success, failed, processingTimeMs);
         }
     }
 }
