@@ -25,13 +25,14 @@ CREATE TABLE IF NOT EXISTS t_stock_daily (
     is_st SMALLINT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uk_stock_daily_unique UNIQUE (stock_code, trade_date)
+    CONSTRAINT uk_stock_daily_unique UNIQUE (stock_code, trade_date, adjust_flag)
 );
 
 -- 创建索引
 CREATE INDEX IF NOT EXISTS idx_stock_daily_code ON t_stock_daily(stock_code);
 CREATE INDEX IF NOT EXISTS idx_stock_daily_date ON t_stock_daily(trade_date);
-CREATE INDEX IF NOT EXISTS idx_stock_daily_code_date ON t_stock_daily(stock_code, trade_date DESC);
+CREATE INDEX IF NOT EXISTS idx_stock_daily_code_date_adjust ON t_stock_daily(stock_code, trade_date DESC, adjust_flag);
+CREATE INDEX IF NOT EXISTS idx_stock_daily_adjust_flag ON t_stock_daily(adjust_flag);
 
 -- 表注释
 COMMENT ON TABLE t_stock_daily IS '股票日线行情表';

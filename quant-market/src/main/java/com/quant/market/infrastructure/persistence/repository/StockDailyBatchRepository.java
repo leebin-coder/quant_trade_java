@@ -43,7 +43,7 @@ public class StockDailyBatchRepository {
                 pe_ttm, pb_mrq, ps_ttm, pcf_ncf_ttm, is_st,
                 created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (stock_code, trade_date) DO NOTHING
+            ON CONFLICT (stock_code, trade_date, adjust_flag) DO NOTHING
             """;
 
         int[][] results = jdbcTemplate.batchUpdate(sql, entities, entities.size(),
@@ -116,7 +116,7 @@ public class StockDailyBatchRepository {
                 pe_ttm, pb_mrq, ps_ttm, pcf_ncf_ttm, is_st,
                 created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (stock_code, trade_date)
+            ON CONFLICT (stock_code, trade_date, adjust_flag)
             DO UPDATE SET
                 open_price = EXCLUDED.open_price,
                 high_price = EXCLUDED.high_price,

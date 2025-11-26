@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "t_stock_daily",
        uniqueConstraints = @UniqueConstraint(
            name = "uk_stock_daily_unique",
-           columnNames = {"stock_code", "trade_date"}
+           columnNames = {"stock_code", "trade_date", "adjust_flag"}
        ))
 public class StockDailyEntity {
 
@@ -68,16 +68,16 @@ public class StockDailyEntity {
     @Column(name = "trade_status")
     private Short tradeStatus;
 
-    @Column(name = "pe_ttm", precision = 10, scale = 4)
+    @Column(name = "pe_ttm", precision = 10, scale = 6)
     private BigDecimal peTtm;
 
-    @Column(name = "pb_mrq", precision = 10, scale = 4)
+    @Column(name = "pb_mrq", precision = 10, scale = 6)
     private BigDecimal pbMrq;
 
-    @Column(name = "ps_ttm", precision = 10, scale = 4)
+    @Column(name = "ps_ttm", precision = 10, scale = 6)
     private BigDecimal psTtm;
 
-    @Column(name = "pcf_ncf_ttm", precision = 10, scale = 4)
+    @Column(name = "pcf_ncf_ttm", precision = 10, scale = 6)
     private BigDecimal pcfNcfTtm;
 
     @Column(name = "is_st")

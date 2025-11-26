@@ -17,14 +17,26 @@ import java.util.Optional;
 public interface StockDailyJpaRepository extends JpaRepository<StockDailyEntity, Long> {
 
     /**
-     * Find by stock code and trade date
+     * Find by stock code and trade date (any adjust flag)
      */
     Optional<StockDailyEntity> findByStockCodeAndTradeDate(String stockCode, LocalDate tradeDate);
 
     /**
-     * Check if exists by stock code and trade date
+     * Find by stock code, trade date and adjust flag
+     */
+    Optional<StockDailyEntity> findByStockCodeAndTradeDateAndAdjustFlag(
+            String stockCode, LocalDate tradeDate, Short adjustFlag);
+
+    /**
+     * Check if exists by stock code and trade date (any adjust flag)
      */
     boolean existsByStockCodeAndTradeDate(String stockCode, LocalDate tradeDate);
+
+    /**
+     * Check if exists by stock code, trade date and adjust flag
+     */
+    boolean existsByStockCodeAndTradeDateAndAdjustFlag(
+            String stockCode, LocalDate tradeDate, Short adjustFlag);
 
     /**
      * Find by stock code ordered by trade date descending
