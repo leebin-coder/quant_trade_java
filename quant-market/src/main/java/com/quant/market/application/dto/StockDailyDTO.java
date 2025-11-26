@@ -45,6 +45,22 @@ public class StockDailyDTO {
 
     private BigDecimal amount;
 
+    private Short adjustFlag;
+
+    private BigDecimal turn;
+
+    private Short tradeStatus;
+
+    private BigDecimal peTtm;
+
+    private BigDecimal pbMrq;
+
+    private BigDecimal psTtm;
+
+    private BigDecimal pcfNcfTtm;
+
+    private Short isSt;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
@@ -68,6 +84,14 @@ public class StockDailyDTO {
                 .pctChange(daily.getPctChange())
                 .volume(daily.getVolume())
                 .amount(daily.getAmount())
+                .adjustFlag(daily.getAdjustFlag())
+                .turn(daily.getTurn())
+                .tradeStatus(daily.getTradeStatus())
+                .peTtm(daily.getPeTtm())
+                .pbMrq(daily.getPbMrq())
+                .psTtm(daily.getPsTtm())
+                .pcfNcfTtm(daily.getPcfNcfTtm())
+                .isSt(daily.getIsSt())
                 .createdAt(daily.getCreatedAt())
                 .updatedAt(daily.getUpdatedAt())
                 .build();
@@ -90,6 +114,14 @@ public class StockDailyDTO {
                 .pctChange(pctChange)
                 .volume(volume)
                 .amount(amount)
+                .adjustFlag(adjustFlag)
+                .turn(turn)
+                .tradeStatus(tradeStatus)
+                .peTtm(peTtm)
+                .pbMrq(pbMrq)
+                .psTtm(psTtm)
+                .pcfNcfTtm(pcfNcfTtm)
+                .isSt(isSt)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();

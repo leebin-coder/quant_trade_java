@@ -39,8 +39,10 @@ public class StockDailyBatchRepository {
             INSERT INTO t_stock_daily (
                 stock_code, trade_date, open_price, high_price, low_price,
                 close_price, pre_close, change_amount, pct_change,
-                volume, amount, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                volume, amount, adjust_flag, turn, trade_status,
+                pe_ttm, pb_mrq, ps_ttm, pcf_ncf_ttm, is_st,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (stock_code, trade_date) DO NOTHING
             """;
 
@@ -59,8 +61,28 @@ public class StockDailyBatchRepository {
                 ps.setBigDecimal(9, entity.getPctChange());
                 ps.setBigDecimal(10, entity.getVolume());
                 ps.setBigDecimal(11, entity.getAmount());
-                ps.setTimestamp(12, now);
-                ps.setTimestamp(13, now);
+                if (entity.getAdjustFlag() != null) {
+                    ps.setShort(12, entity.getAdjustFlag());
+                } else {
+                    ps.setNull(12, java.sql.Types.SMALLINT);
+                }
+                ps.setBigDecimal(13, entity.getTurn());
+                if (entity.getTradeStatus() != null) {
+                    ps.setShort(14, entity.getTradeStatus());
+                } else {
+                    ps.setNull(14, java.sql.Types.SMALLINT);
+                }
+                ps.setBigDecimal(15, entity.getPeTtm());
+                ps.setBigDecimal(16, entity.getPbMrq());
+                ps.setBigDecimal(17, entity.getPsTtm());
+                ps.setBigDecimal(18, entity.getPcfNcfTtm());
+                if (entity.getIsSt() != null) {
+                    ps.setShort(19, entity.getIsSt());
+                } else {
+                    ps.setNull(19, java.sql.Types.SMALLINT);
+                }
+                ps.setTimestamp(20, now);
+                ps.setTimestamp(21, now);
             });
 
         int totalInserted = 0;
@@ -90,8 +112,10 @@ public class StockDailyBatchRepository {
             INSERT INTO t_stock_daily (
                 stock_code, trade_date, open_price, high_price, low_price,
                 close_price, pre_close, change_amount, pct_change,
-                volume, amount, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                volume, amount, adjust_flag, turn, trade_status,
+                pe_ttm, pb_mrq, ps_ttm, pcf_ncf_ttm, is_st,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (stock_code, trade_date)
             DO UPDATE SET
                 open_price = EXCLUDED.open_price,
@@ -103,6 +127,14 @@ public class StockDailyBatchRepository {
                 pct_change = EXCLUDED.pct_change,
                 volume = EXCLUDED.volume,
                 amount = EXCLUDED.amount,
+                adjust_flag = EXCLUDED.adjust_flag,
+                turn = EXCLUDED.turn,
+                trade_status = EXCLUDED.trade_status,
+                pe_ttm = EXCLUDED.pe_ttm,
+                pb_mrq = EXCLUDED.pb_mrq,
+                ps_ttm = EXCLUDED.ps_ttm,
+                pcf_ncf_ttm = EXCLUDED.pcf_ncf_ttm,
+                is_st = EXCLUDED.is_st,
                 updated_at = CURRENT_TIMESTAMP
             """;
 
@@ -121,8 +153,28 @@ public class StockDailyBatchRepository {
                 ps.setBigDecimal(9, entity.getPctChange());
                 ps.setBigDecimal(10, entity.getVolume());
                 ps.setBigDecimal(11, entity.getAmount());
-                ps.setTimestamp(12, now);
-                ps.setTimestamp(13, now);
+                if (entity.getAdjustFlag() != null) {
+                    ps.setShort(12, entity.getAdjustFlag());
+                } else {
+                    ps.setNull(12, java.sql.Types.SMALLINT);
+                }
+                ps.setBigDecimal(13, entity.getTurn());
+                if (entity.getTradeStatus() != null) {
+                    ps.setShort(14, entity.getTradeStatus());
+                } else {
+                    ps.setNull(14, java.sql.Types.SMALLINT);
+                }
+                ps.setBigDecimal(15, entity.getPeTtm());
+                ps.setBigDecimal(16, entity.getPbMrq());
+                ps.setBigDecimal(17, entity.getPsTtm());
+                ps.setBigDecimal(18, entity.getPcfNcfTtm());
+                if (entity.getIsSt() != null) {
+                    ps.setShort(19, entity.getIsSt());
+                } else {
+                    ps.setNull(19, java.sql.Types.SMALLINT);
+                }
+                ps.setTimestamp(20, now);
+                ps.setTimestamp(21, now);
             });
 
         int totalAffected = 0;

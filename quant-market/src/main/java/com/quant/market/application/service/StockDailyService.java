@@ -37,13 +37,15 @@ public class StockDailyService {
      */
     @Transactional(readOnly = true)
     public List<StockDailyDTO> queryDailyData(DailyQueryRequest request) {
-        log.info("Querying daily data: stockCode={}, startDate={}, endDate={}, sortOrder={}",
-                request.getStockCode(), request.getStartDate(), request.getEndDate(), request.getSortOrder());
+        log.info("Querying daily data: stockCode={}, startDate={}, endDate={}, adjustFlag={}, sortOrder={}",
+                request.getStockCode(), request.getStartDate(), request.getEndDate(),
+                request.getAdjustFlag(), request.getSortOrder());
 
         List<StockDaily> dailyList = dailyRepository.queryDailyData(
                 request.getStockCode(),
                 request.getStartDate(),
                 request.getEndDate(),
+                request.getAdjustFlag(),
                 request.isAscending()
         );
 
@@ -146,6 +148,18 @@ public class StockDailyService {
     @Transactional(readOnly = true)
     public java.time.LocalDate getLatestTradeDate() {
         return dailyRepository.findLatestTradeDate();
+    }
+
+    /**
+     * Get the latest trade date for a specific stock and adjust flag
+     *
+     * @param stockCode Stock code (required)
+     * @param adjustFlag Adjust flag (optional, null means ignore adjust flag)
+     * @return Latest trade date, or null if no data exists
+     */
+    @Transactional(readOnly = true)
+    public java.time.LocalDate getLatestTradeDate(String stockCode, Integer adjustFlag) {
+        return dailyRepository.findLatestTradeDate(stockCode, adjustFlag);
     }
 
     /**

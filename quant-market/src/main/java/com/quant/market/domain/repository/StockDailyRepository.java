@@ -42,6 +42,7 @@ public interface StockDailyRepository {
      * @param stockCode Stock code (required)
      * @param startDate Start date (optional)
      * @param endDate End date (optional)
+     * @param adjustFlag Adjust flag (optional, null means all types)
      * @param ascending Sort order (true=ascending, false=descending)
      * @return List of daily data
      */
@@ -49,6 +50,7 @@ public interface StockDailyRepository {
             String stockCode,
             LocalDate startDate,
             LocalDate endDate,
+            Integer adjustFlag,
             boolean ascending);
 
     /**
@@ -72,4 +74,13 @@ public interface StockDailyRepository {
      * @return Latest trade date, or null if no data exists
      */
     LocalDate findLatestTradeDate();
+
+    /**
+     * Find the latest trade date for a specific stock and adjust flag
+     *
+     * @param stockCode Stock code (required)
+     * @param adjustFlag Adjust flag (optional, null means ignore adjust flag)
+     * @return Latest trade date, or null if no data exists
+     */
+    LocalDate findLatestTradeDate(String stockCode, Integer adjustFlag);
 }

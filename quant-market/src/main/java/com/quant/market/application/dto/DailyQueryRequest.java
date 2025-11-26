@@ -45,6 +45,15 @@ public class DailyQueryRequest {
     private String sortOrder = "desc";
 
     /**
+     * Adjust flag (optional)
+     * 1 = 后复权 (backward adjusted)
+     * 2 = 前复权 (forward adjusted)
+     * 3 = 不复权 (unadjusted)
+     * null = all types
+     */
+    private Integer adjustFlag;
+
+    /**
      * Check if sort order is ascending
      */
     public boolean isAscending() {

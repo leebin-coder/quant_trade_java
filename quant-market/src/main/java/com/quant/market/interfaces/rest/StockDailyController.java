@@ -190,9 +190,23 @@ public class StockDailyController {
      * Get the latest trade date
      * GET /api/stock-daily/latest-date
      *
+     * Query parameters:
+     * - stockCode (optional): Stock code to filter by
+     * - adjustFlag (optional): Adjust flag to filter by (1=后复权, 2=前复权, 3=不复权)
+     *
      * Returns the most recent trade date in the database as a string.
-     * - If no data exists in the table, returns null
+     * - If no data exists, returns null
      * - If data exists, returns the latest trade date in "yyyy-MM-dd" format
+     *
+     * Examples:
+     * 1. Get global latest trade date:
+     *    GET /api/stock-daily/latest-date
+     *
+     * 2. Get latest trade date for a specific stock:
+     *    GET /api/stock-daily/latest-date?stockCode=600000
+     *
+     * 3. Get latest trade date for a specific stock and adjust flag:
+     *    GET /api/stock-daily/latest-date?stockCode=600000&adjustFlag=3
      *
      * Response example when data exists:
      * "2024-12-31"
@@ -200,13 +214,23 @@ public class StockDailyController {
      * Response example when no data exists:
      * null
      *
+     * @param stockCode Stock code (optional)
+     * @param adjustFlag Adjust flag (optional)
      * @return Latest trade date string or null if no data exists
      */
     @GetMapping("/latest-date")
-    public Result<String> getLatestTradeDate() {
-        log.info("REST request to get latest trade date");
+    public Result<String> getLatestTradeDate(
+            @RequestParam(required = false) String stockCode,
+            @RequestParam(required = false) Integer adjustFlag) {
+        log.info("REST request to get latest trade date: stockCode={}, adjustFlag={}", stockCode, adjustFlag);
 
-        java.time.LocalDate latestDate = dailyService.getLatestTradeDate();
+        java.time.LocalDate latestDate;
+        if (stockCode != null) {
+            latestDate = dailyService.getLatestTradeDate(stockCode, adjustFlag);
+        } else {
+            latestDate = dailyService.getLatestTradeDate();
+        }
+
         String dateString = latestDate != null ? latestDate.toString() : null;
 
         log.info("Latest trade date: {}", dateString);

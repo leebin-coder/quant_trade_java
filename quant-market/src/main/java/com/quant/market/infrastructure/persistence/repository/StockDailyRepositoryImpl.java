@@ -60,6 +60,7 @@ public class StockDailyRepositoryImpl implements StockDailyRepository {
             String stockCode,
             LocalDate startDate,
             LocalDate endDate,
+            Integer adjustFlag,
             boolean ascending) {
 
         List<StockDailyEntity> entities;
@@ -89,6 +90,14 @@ public class StockDailyRepositoryImpl implements StockDailyRepository {
                     : jpaRepository.findByStockCodeOrderByTradeDateDesc(stockCode);
         }
 
+        // Filter by adjustFlag if provided
+        if (adjustFlag != null) {
+            Short adjustFlagShort = adjustFlag.shortValue();
+            entities = entities.stream()
+                    .filter(entity -> adjustFlagShort.equals(entity.getAdjustFlag()))
+                    .collect(Collectors.toList());
+        }
+
         return entities.stream()
                 .map(StockDailyEntity::toDomain)
                 .collect(Collectors.toList());
@@ -112,5 +121,14 @@ public class StockDailyRepositoryImpl implements StockDailyRepository {
     @Override
     public LocalDate findLatestTradeDate() {
         return jpaRepository.findLatestTradeDate();
+    }
+
+    @Override
+    public LocalDate findLatestTradeDate(String stockCode, Integer adjustFlag) {
+        if (adjustFlag != null) {
+            return jpaRepository.findLatestTradeDateByStockCodeAndAdjustFlag(stockCode, adjustFlag.shortValue());
+        } else {
+            return jpaRepository.findLatestTradeDateByStockCode(stockCode);
+        }
     }
 }

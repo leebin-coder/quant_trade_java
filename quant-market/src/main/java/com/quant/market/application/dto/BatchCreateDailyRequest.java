@@ -47,6 +47,22 @@ public class BatchCreateDailyRequest {
 
     private BigDecimal amount;
 
+    private Short adjustFlag;
+
+    private BigDecimal turn;
+
+    private Short tradeStatus;
+
+    private BigDecimal peTtm;
+
+    private BigDecimal pbMrq;
+
+    private BigDecimal psTtm;
+
+    private BigDecimal pcfNcfTtm;
+
+    private Short isSt;
+
     /**
      * Convert to domain model
      */
@@ -63,6 +79,14 @@ public class BatchCreateDailyRequest {
                 .pctChange(pctChange)
                 .volume(volume)
                 .amount(amount)
+                .adjustFlag(adjustFlag)
+                .turn(turn)
+                .tradeStatus(tradeStatus)
+                .peTtm(peTtm)
+                .pbMrq(pbMrq)
+                .psTtm(psTtm)
+                .pcfNcfTtm(pcfNcfTtm)
+                .isSt(isSt)
                 .build();
     }
 }

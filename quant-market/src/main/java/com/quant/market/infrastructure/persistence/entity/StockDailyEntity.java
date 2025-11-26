@@ -59,6 +59,30 @@ public class StockDailyEntity {
     @Column(name = "amount", precision = 20, scale = 2)
     private BigDecimal amount;
 
+    @Column(name = "adjust_flag")
+    private Short adjustFlag;
+
+    @Column(name = "turn", precision = 10, scale = 6)
+    private BigDecimal turn;
+
+    @Column(name = "trade_status")
+    private Short tradeStatus;
+
+    @Column(name = "pe_ttm", precision = 10, scale = 4)
+    private BigDecimal peTtm;
+
+    @Column(name = "pb_mrq", precision = 10, scale = 4)
+    private BigDecimal pbMrq;
+
+    @Column(name = "ps_ttm", precision = 10, scale = 4)
+    private BigDecimal psTtm;
+
+    @Column(name = "pcf_ncf_ttm", precision = 10, scale = 4)
+    private BigDecimal pcfNcfTtm;
+
+    @Column(name = "is_st")
+    private Short isSt;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -93,6 +117,14 @@ public class StockDailyEntity {
                 .pctChange(pctChange)
                 .volume(volume)
                 .amount(amount)
+                .adjustFlag(adjustFlag)
+                .turn(turn)
+                .tradeStatus(tradeStatus)
+                .peTtm(peTtm)
+                .pbMrq(pbMrq)
+                .psTtm(psTtm)
+                .pcfNcfTtm(pcfNcfTtm)
+                .isSt(isSt)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
@@ -115,6 +147,14 @@ public class StockDailyEntity {
         entity.setPctChange(daily.getPctChange());
         entity.setVolume(daily.getVolume());
         entity.setAmount(daily.getAmount());
+        entity.setAdjustFlag(daily.getAdjustFlag());
+        entity.setTurn(daily.getTurn());
+        entity.setTradeStatus(daily.getTradeStatus());
+        entity.setPeTtm(daily.getPeTtm());
+        entity.setPbMrq(daily.getPbMrq());
+        entity.setPsTtm(daily.getPsTtm());
+        entity.setPcfNcfTtm(daily.getPcfNcfTtm());
+        entity.setIsSt(daily.getIsSt());
         entity.setCreatedAt(daily.getCreatedAt());
         entity.setUpdatedAt(daily.getUpdatedAt());
         return entity;

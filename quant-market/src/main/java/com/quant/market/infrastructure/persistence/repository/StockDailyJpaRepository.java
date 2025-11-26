@@ -99,4 +99,18 @@ public interface StockDailyJpaRepository extends JpaRepository<StockDailyEntity,
      */
     @Query("SELECT MAX(d.tradeDate) FROM StockDailyEntity d")
     LocalDate findLatestTradeDate();
+
+    /**
+     * Find the latest trade date for a specific stock code
+     */
+    @Query("SELECT MAX(d.tradeDate) FROM StockDailyEntity d WHERE d.stockCode = :stockCode")
+    LocalDate findLatestTradeDateByStockCode(@Param("stockCode") String stockCode);
+
+    /**
+     * Find the latest trade date for a specific stock code and adjust flag
+     */
+    @Query("SELECT MAX(d.tradeDate) FROM StockDailyEntity d WHERE d.stockCode = :stockCode AND d.adjustFlag = :adjustFlag")
+    LocalDate findLatestTradeDateByStockCodeAndAdjustFlag(
+            @Param("stockCode") String stockCode,
+            @Param("adjustFlag") Short adjustFlag);
 }

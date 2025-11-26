@@ -1,20 +1,28 @@
 -- 创建股票日线行情表
--- Tushare Pro API: https://tushare.pro/document/2?doc_id=27
+-- baostock API: http://www.baostock.com/mainContent?file=stockKData.md
 -- 未复权行情数据，每交易日15点～16点入库
 
 CREATE TABLE IF NOT EXISTS t_stock_daily (
     id BIGSERIAL PRIMARY KEY,
     stock_code VARCHAR(20) NOT NULL,
     trade_date DATE NOT NULL,
-    open_price DECIMAL(10,2),
-    high_price DECIMAL(10,2),
-    low_price DECIMAL(10,2),
-    close_price DECIMAL(10,2),
-    pre_close DECIMAL(10,2),
-    change_amount DECIMAL(10,2),
-    pct_change DECIMAL(10,4),
-    volume DECIMAL(20,2),
-    amount DECIMAL(20,2),
+    open_price DECIMAL(10,4),
+    high_price DECIMAL(10,4),
+    low_price DECIMAL(10,4),
+    close_price DECIMAL(10,4),
+    pre_close DECIMAL(10,4),
+    change_amount DECIMAL(10,4),
+    pct_change DECIMAL(10,6),
+    volume DECIMAL(20,4),
+    amount DECIMAL(20,4),
+    adjust_flag SMALLINT DEFAULT 3,
+    turn DECIMAL(10,6),
+    trade_status SMALLINT,
+    pe_ttm DECIMAL(10,6),
+    pb_mrq DECIMAL(10,6),
+    ps_ttm DECIMAL(10,6),
+    pcf_ncf_ttm DECIMAL(10,6),
+    is_st SMALLINT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uk_stock_daily_unique UNIQUE (stock_code, trade_date)
@@ -26,7 +34,7 @@ CREATE INDEX IF NOT EXISTS idx_stock_daily_date ON t_stock_daily(trade_date);
 CREATE INDEX IF NOT EXISTS idx_stock_daily_code_date ON t_stock_daily(stock_code, trade_date DESC);
 
 -- 表注释
-COMMENT ON TABLE t_stock_daily IS '股票日线行情表（未复权）';
+COMMENT ON TABLE t_stock_daily IS '股票日线行情表';
 
 -- 列注释
 COMMENT ON COLUMN t_stock_daily.id IS '主键ID';
@@ -41,6 +49,14 @@ COMMENT ON COLUMN t_stock_daily.change_amount IS '涨跌额';
 COMMENT ON COLUMN t_stock_daily.pct_change IS '涨跌幅（基于除权后的昨收计算）';
 COMMENT ON COLUMN t_stock_daily.volume IS '成交量（手）';
 COMMENT ON COLUMN t_stock_daily.amount IS '成交额（千元）';
+COMMENT ON COLUMN t_stock_daily.adjust_flag IS '复权标识：1-后复权；2-前复权；3-不复权';
+COMMENT ON COLUMN t_stock_daily.turn IS '换手率（%）';
+COMMENT ON COLUMN t_stock_daily.trade_status IS '交易状态：1-正常交易；0-停牌';
+COMMENT ON COLUMN t_stock_daily.pe_ttm IS '滚动市盈率';
+COMMENT ON COLUMN t_stock_daily.pb_mrq IS '市净率';
+COMMENT ON COLUMN t_stock_daily.ps_ttm IS '滚动市销率';
+COMMENT ON COLUMN t_stock_daily.pcf_ncf_ttm IS '滚动市现率';
+COMMENT ON COLUMN t_stock_daily.is_st IS '是否ST股：1-是；0-否';
 COMMENT ON COLUMN t_stock_daily.created_at IS '创建时间';
 COMMENT ON COLUMN t_stock_daily.updated_at IS '更新时间';
 

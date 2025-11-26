@@ -79,6 +79,46 @@ public class StockDaily extends BaseEntity {
      */
     private BigDecimal amount;
 
+    /**
+     * 复权标识：1-后复权；2-前复权；3-不复权
+     */
+    private Short adjustFlag;
+
+    /**
+     * 换手率（%）
+     */
+    private BigDecimal turn;
+
+    /**
+     * 交易状态：1-正常交易；0-停牌
+     */
+    private Short tradeStatus;
+
+    /**
+     * 滚动市盈率
+     */
+    private BigDecimal peTtm;
+
+    /**
+     * 市净率
+     */
+    private BigDecimal pbMrq;
+
+    /**
+     * 滚动市销率
+     */
+    private BigDecimal psTtm;
+
+    /**
+     * 滚动市现率
+     */
+    private BigDecimal pcfNcfTtm;
+
+    /**
+     * 是否ST股：1-是；0-否
+     */
+    private Short isSt;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
