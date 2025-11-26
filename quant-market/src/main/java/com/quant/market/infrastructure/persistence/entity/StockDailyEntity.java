@@ -32,31 +32,31 @@ public class StockDailyEntity {
     @Column(name = "trade_date", nullable = false)
     private LocalDate tradeDate;
 
-    @Column(name = "open_price", precision = 10, scale = 2)
+    @Column(name = "open_price", precision = 10, scale = 4)
     private BigDecimal openPrice;
 
-    @Column(name = "high_price", precision = 10, scale = 2)
+    @Column(name = "high_price", precision = 10, scale = 4)
     private BigDecimal highPrice;
 
-    @Column(name = "low_price", precision = 10, scale = 2)
+    @Column(name = "low_price", precision = 10, scale = 4)
     private BigDecimal lowPrice;
 
-    @Column(name = "close_price", precision = 10, scale = 2)
+    @Column(name = "close_price", precision = 10, scale = 4)
     private BigDecimal closePrice;
 
-    @Column(name = "pre_close", precision = 10, scale = 2)
+    @Column(name = "pre_close", precision = 10, scale = 4)
     private BigDecimal preClose;
 
-    @Column(name = "change_amount", precision = 10, scale = 2)
+    @Column(name = "change_amount", precision = 10, scale = 4)
     private BigDecimal changeAmount;
 
     @Column(name = "pct_change", precision = 10, scale = 4)
     private BigDecimal pctChange;
 
-    @Column(name = "volume", precision = 20, scale = 2)
+    @Column(name = "volume", precision = 20, scale = 4)
     private BigDecimal volume;
 
-    @Column(name = "amount", precision = 20, scale = 2)
+    @Column(name = "amount", precision = 20, scale = 4)
     private BigDecimal amount;
 
     @Column(name = "adjust_flag")
@@ -68,16 +68,16 @@ public class StockDailyEntity {
     @Column(name = "trade_status")
     private Short tradeStatus;
 
-    @Column(name = "pe_ttm", precision = 10, scale = 6)
+    @Column(name = "pe_ttm", precision = 18, scale = 6)
     private BigDecimal peTtm;
 
-    @Column(name = "pb_mrq", precision = 10, scale = 6)
+    @Column(name = "pb_mrq", precision = 18, scale = 6)
     private BigDecimal pbMrq;
 
-    @Column(name = "ps_ttm", precision = 10, scale = 6)
+    @Column(name = "ps_ttm", precision = 18, scale = 6)
     private BigDecimal psTtm;
 
-    @Column(name = "pcf_ncf_ttm", precision = 10, scale = 6)
+    @Column(name = "pcf_ncf_ttm", precision = 18, scale = 6)
     private BigDecimal pcfNcfTtm;
 
     @Column(name = "is_st")
