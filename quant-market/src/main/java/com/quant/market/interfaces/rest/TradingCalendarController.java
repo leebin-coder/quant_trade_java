@@ -8,8 +8,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,5 +198,44 @@ public class TradingCalendarController {
         stats.put("totalRecords", calendarService.getCalendarCount());
 
         return Result.success(stats);
+    }
+
+    /**
+     * Check if a given date is a trading day
+     * GET /api/trading-calendar/is-trading-day
+     *
+     * Query parameter:
+     * - date: Date to check (required, format: yyyy-MM-dd)
+     *
+     * Example: GET /api/trading-calendar/is-trading-day?date=2024-01-15
+     *
+     * Response example:
+     * {
+     *   "code": 200,
+     *   "message": "success",
+     *   "data": {
+     *     "date": "2024-01-15",
+     *     "isTradingDay": true
+     *   }
+     * }
+     *
+     * Note: Returns false if the date is not found in the calendar or is marked as non-trading day
+     *
+     * @param date Date to check (format: yyyy-MM-dd)
+     * @return Whether the date is a trading day
+     */
+    @GetMapping("/is-trading-day")
+    public Result<Map<String, Object>> isTradingDay(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        log.info("REST request to check if {} is a trading day", date);
+
+        boolean isTradingDay = calendarService.isTradingDay(date);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("date", date.toString());
+        response.put("isTradingDay", isTradingDay);
+
+        log.info("Date {} is {}a trading day", date, isTradingDay ? "" : "NOT ");
+        return Result.success(response);
     }
 }

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -134,6 +135,21 @@ public class TradingCalendarService {
     @Transactional(readOnly = true)
     public long getCalendarCount() {
         return jpaRepository.count();
+    }
+
+    /**
+     * Check if a given date is a trading day
+     *
+     * @param date Date to check (format: yyyy-MM-dd)
+     * @return true if it's a trading day, false if it's not a trading day or not found in calendar
+     */
+    @Transactional(readOnly = true)
+    public boolean isTradingDay(LocalDate date) {
+        log.info("Checking if {} is a trading day", date);
+
+        return jpaRepository.findByTradeDate(date)
+                .map(entity -> entity.getIsTradingDay() == 1)
+                .orElse(false);
     }
 
     /**
