@@ -30,6 +30,7 @@ public class ClickHouseConfig {
         props.setProperty("password", properties.getPassword());
         props.setProperty("socket_timeout", "30000");
         props.setProperty("connect_timeout", "30000");
+        props.setProperty("compress", "0");
 
         String url = String.format("jdbc:clickhouse://%s:%d/%s",
                 properties.getHost(),
