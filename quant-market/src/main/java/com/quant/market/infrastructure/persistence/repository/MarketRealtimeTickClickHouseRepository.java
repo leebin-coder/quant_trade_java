@@ -80,7 +80,8 @@ public class MarketRealtimeTickClickHouseRepository {
     public List<MarketRealtimeTickDTO> findTicksForDate(String tsCode, LocalDate tradingDate) {
         log.debug("Query ticks for {} at {}", tsCode, tradingDate);
         String sql = """
-                SELECT """ + BASE_COLUMNS + """
+                SELECT
+                """ + BASE_COLUMNS + """
                 FROM quant_trade.market_realtime_ticks
                 WHERE ts_code = ?
                   AND date = ?
@@ -94,7 +95,8 @@ public class MarketRealtimeTickClickHouseRepository {
      */
     public Optional<MarketRealtimeTickDTO> findLatestTick(String tsCode, LocalDate tradingDate) {
         String sql = """
-                SELECT """ + BASE_COLUMNS + """
+                SELECT
+                """ + BASE_COLUMNS + """
                 FROM quant_trade.market_realtime_ticks
                 WHERE ts_code = ?
                   AND date = ?
