@@ -82,10 +82,10 @@ public class MarketRealtimeTickClickHouseRepository {
                 SELECT %s
                 FROM quant_trade.market_realtime_ticks
                 WHERE ts_code = ?
-                  AND date = ?
+                  AND date = toDate(?)
                 ORDER BY time ASC
                 """.formatted(BASE_COLUMNS);
-        return jdbcTemplate.query(sql, new Object[]{tsCode, Date.valueOf(tradingDate)}, ROW_MAPPER);
+        return jdbcTemplate.query(sql, new Object[]{tsCode, tradingDate.toString()}, ROW_MAPPER);
     }
 
     /**
@@ -96,11 +96,11 @@ public class MarketRealtimeTickClickHouseRepository {
                 SELECT %s
                 FROM quant_trade.market_realtime_ticks
                 WHERE ts_code = ?
-                  AND date = ?
+                  AND date = toDate(?)
                 ORDER BY time DESC
                 LIMIT 1
                 """.formatted(BASE_COLUMNS);
-        List<MarketRealtimeTickDTO> ticks = jdbcTemplate.query(sql, new Object[]{tsCode, Date.valueOf(tradingDate)}, ROW_MAPPER);
+        List<MarketRealtimeTickDTO> ticks = jdbcTemplate.query(sql, new Object[]{tsCode, tradingDate.toString()}, ROW_MAPPER);
         return ticks.isEmpty() ? Optional.empty() : Optional.of(ticks.getFirst());
     }
 
