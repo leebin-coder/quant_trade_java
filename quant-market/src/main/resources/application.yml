@@ -60,7 +60,7 @@ management:
 
 clickhouse:
   host: ${CLICKHOUSE_HOST:clickhouse-m4}
-  port: ${CLICKHOUSE_PORT:9000}
+  port: ${CLICKHOUSE_PORT:8123}
   database: ${CLICKHOUSE_DB:quant_trade}
   username: ${CLICKHOUSE_USERNAME:libin}
   password: ${CLICKHOUSE_PASSWORD:libin122351}
