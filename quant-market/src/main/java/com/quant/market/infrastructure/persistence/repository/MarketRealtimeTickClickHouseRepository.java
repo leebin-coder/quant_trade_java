@@ -27,12 +27,11 @@ public class MarketRealtimeTickClickHouseRepository {
 
     private final @Qualifier("clickHouseJdbcTemplate") JdbcTemplate jdbcTemplate;
 
-    private static final String BASE_COLUMNS = """
-            ts_code, name, trade, price, open, high, low, pre_close, bid, ask,
-            volume, amount, b1_v, b1_p, b2_v, b2_p, b3_v, b3_p, b4_v, b4_p, b5_v, b5_p,
-            a1_v, a1_p, a2_v, a2_p, a3_v, a3_p, a4_v, a4_p, a5_v, a5_p,
-            date, time, source, raw_json
-            """;
+    private static final String BASE_COLUMNS = String.join(", ",
+            "ts_code", "name", "trade", "price", "open", "high", "low", "pre_close", "bid", "ask",
+            "volume", "amount", "b1_v", "b1_p", "b2_v", "b2_p", "b3_v", "b3_p", "b4_v", "b4_p", "b5_v", "b5_p",
+            "a1_v", "a1_p", "a2_v", "a2_p", "a3_v", "a3_p", "a4_v", "a4_p", "a5_v", "a5_p",
+            "date", "time", "source", "raw_json");
 
     private static final RowMapper<MarketRealtimeTickDTO> ROW_MAPPER = (rs, rowNum) ->
             MarketRealtimeTickDTO.builder()
@@ -80,13 +79,12 @@ public class MarketRealtimeTickClickHouseRepository {
     public List<MarketRealtimeTickDTO> findTicksForDate(String tsCode, LocalDate tradingDate) {
         log.debug("Query ticks for {} at {}", tsCode, tradingDate);
         String sql = """
-                SELECT
-                """ + BASE_COLUMNS + """
+                SELECT %s
                 FROM quant_trade.market_realtime_ticks
                 WHERE ts_code = ?
                   AND date = ?
                 ORDER BY time ASC
-                """;
+                """.formatted(BASE_COLUMNS);
         return jdbcTemplate.query(sql, new Object[]{tsCode, Date.valueOf(tradingDate)}, ROW_MAPPER);
     }
 
@@ -95,14 +93,13 @@ public class MarketRealtimeTickClickHouseRepository {
      */
     public Optional<MarketRealtimeTickDTO> findLatestTick(String tsCode, LocalDate tradingDate) {
         String sql = """
-                SELECT
-                """ + BASE_COLUMNS + """
+                SELECT %s
                 FROM quant_trade.market_realtime_ticks
                 WHERE ts_code = ?
                   AND date = ?
                 ORDER BY time DESC
                 LIMIT 1
-                """;
+                """.formatted(BASE_COLUMNS);
         List<MarketRealtimeTickDTO> ticks = jdbcTemplate.query(sql, new Object[]{tsCode, Date.valueOf(tradingDate)}, ROW_MAPPER);
         return ticks.isEmpty() ? Optional.empty() : Optional.of(ticks.getFirst());
     }
