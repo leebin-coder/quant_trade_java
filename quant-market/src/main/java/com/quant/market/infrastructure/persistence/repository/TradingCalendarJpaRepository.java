@@ -32,4 +32,10 @@ public interface TradingCalendarJpaRepository extends JpaRepository<TradingCalen
      * Find by trade date
      */
     Optional<TradingCalendarEntity> findByTradeDate(LocalDate tradeDate);
+
+    /**
+     * Find latest trading day that is less than or equal to the given date.
+     */
+    Optional<TradingCalendarEntity> findFirstByTradeDateLessThanEqualAndIsTradingDayOrderByTradeDateDesc(
+            LocalDate tradeDate, Short isTradingDay);
 }

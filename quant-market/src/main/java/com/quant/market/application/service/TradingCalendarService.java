@@ -153,6 +153,25 @@ public class TradingCalendarService {
     }
 
     /**
+     * Get the latest trading day that is less than or equal to the reference date.
+     *
+     * @param referenceDate current date
+     * @return latest available trading day data
+     */
+    @Transactional(readOnly = true)
+    public TradingCalendarDTO getLatestTradingDayOnOrBefore(LocalDate referenceDate) {
+        log.info("Querying latest trading day on or before {}", referenceDate);
+
+        TradingCalendarEntity entity = jpaRepository
+                .findFirstByTradeDateLessThanEqualAndIsTradingDayOrderByTradeDateDesc(referenceDate, (short) 1)
+                .orElseThrow(() -> new BusinessException(
+                        ResultCode.NOT_FOUND.getCode(),
+                        "No trading calendar data found before " + referenceDate));
+
+        return TradingCalendarDTO.fromEntity(entity);
+    }
+
+    /**
      * Batch Upsert Result DTO
      */
     @lombok.Data
