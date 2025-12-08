@@ -28,7 +28,8 @@ public class MarketTickWebSocketHandler extends TextWebSocketHandler {
         }
 
         String stockCode = stockCodeAttr.toString();
-        log.info("WebSocket connected for stockCode {}", stockCode);
+        log.info("WebSocket connected: sessionId={}, stockCode={}, remote={}",
+                session.getId(), stockCode, session.getRemoteAddress());
         tickStreamService.startStreaming(session, stockCode);
     }
 
@@ -41,7 +42,8 @@ public class MarketTickWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         tickStreamService.stopStreaming(session.getId());
-        log.info("WebSocket closed: {} because {}", session.getId(), status);
+        log.info("WebSocket closed: sessionId={}, closeStatus={}, remote={}",
+                session.getId(), status, session.getRemoteAddress());
     }
 
     private void closeSession(WebSocketSession session, CloseStatus status) {

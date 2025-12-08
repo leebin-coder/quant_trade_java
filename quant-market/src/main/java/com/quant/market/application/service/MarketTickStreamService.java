@@ -74,6 +74,8 @@ public class MarketTickStreamService {
     }
 
     private void initializeStream(StreamContext context) {
+        log.info("Initializing tick stream for sessionId={}, stockCode={}",
+                context.getSession().getId(), context.getStockCode());
         try {
             TradingCalendarDTO tradingDay = tradingCalendarService
                     .getLatestTradingDayOnOrBefore(LocalDate.now());
@@ -126,6 +128,8 @@ public class MarketTickStreamService {
             MarketTradingPhase newPhase = determinePhase(context.getTradingDate(), LocalDateTime.now());
             if (newPhase != context.getPhase()) {
                 context.setPhase(newPhase);
+                log.info("Phase changed for sessionId={}, stockCode={}, newPhase={}",
+                        session.getId(), context.getStockCode(), newPhase);
                 sendMessage(session, TickStreamMessage.builder()
                         .type("STATE")
                         .phase(newPhase)
@@ -226,17 +230,21 @@ public class MarketTickStreamService {
 
     private void sendMessage(WebSocketSession session, TickStreamMessage payload) throws JsonProcessingException {
         if (!session.isOpen()) {
+            log.warn("Skip sending message, session {} already closed", session.getId());
             return;
         }
         String json = objectMapper.writeValueAsString(payload);
         try {
             session.sendMessage(new TextMessage(json));
+            log.debug("Sent {} message to session {}", payload.getType(), session.getId());
         } catch (IOException e) {
             log.error("Failed to send websocket message", e);
         }
     }
 
     private void closeSession(StreamContext context, String reason) {
+        log.info("Closing session {} for stockCode {} reason {}",
+                context.getSession().getId(), context.getStockCode(), reason);
         stopStreaming(context.getSession().getId());
         try {
             if (context.getSession().isOpen()) {
@@ -249,6 +257,7 @@ public class MarketTickStreamService {
 
     private void closeWithError(StreamContext context, String reason) {
         try {
+            log.warn("Closing session {} due to error: {}", context.getSession().getId(), reason);
             sendMessage(context.getSession(), TickStreamMessage.builder()
                     .type("ERROR")
                     .phase(MarketTradingPhase.FINISHED)
