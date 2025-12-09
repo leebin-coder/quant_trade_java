@@ -38,8 +38,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/api/auth/**",              // Authentication endpoints
             "/actuator/**",          // Actuator endpoints
             "/error",                // Error endpoint
-            "/favicon.ico",           // Favicon
-            "/ws/**"                    //websocket暂时放开
+            "/favicon.ico"           // Favicon
     );
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
