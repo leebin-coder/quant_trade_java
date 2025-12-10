@@ -201,6 +201,32 @@ public class TradingCalendarController {
     }
 
     /**
+     * Get the latest trading day on or before now
+     * GET /api/trading-calendar/latest-on-or-before
+     *
+     * This endpoint uses the current system date as the reference time,
+     * and returns the latest available trading day information.
+     *
+     * Example response:
+     * {
+     *   "code": 200,
+     *   "message": "success",
+     *   "data": {
+     *     "tradeDate": "2024-02-08",
+     *     "isTradingDay": 1
+     *   }
+     * }
+     *
+     * @return Latest trading day before or equal to the current date
+     */
+    @GetMapping("/latest-on-or-before")
+    public Result<TradingCalendarDTO> getLatestTradingDayOnOrBefore() {
+        log.info("REST request to get latest trading day on or before current date");
+        TradingCalendarDTO calendar = calendarService.getLatestTradingDayOnOrBefore(LocalDate.now());
+        return Result.success(calendar);
+    }
+
+    /**
      * Check if a given date is a trading day
      * GET /api/trading-calendar/is-trading-day
      *
