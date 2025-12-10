@@ -11,8 +11,8 @@ services:
       # Nacos 2.x Authentication
       NACOS_AUTH_ENABLE: "false"
       # JVM Options
-      JVM_XMS: 512m
-      JVM_XMX: 512m
+      JVM_XMS: 256m
+      JVM_XMX: 256m
       # Set console port to 8888 to avoid conflict with Gateway 8080
       JAVA_OPT_EXT: "-Dnacos.console.port=8888"
     volumes:
